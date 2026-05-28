@@ -1,0 +1,14 @@
+{
+  "name": "kr-design-system",
+  "description": "Kaufman Rossin design system plugin for Claude Code. Automated Figma-to-React conversion with Tailwind CSS.",
+  "owner": {
+    "name": "Kaufman Rossin DevTech"
+  },
+  "plugins": [
+    {
+      "name": "figma-tailwind",
+      "source": "./",
+      "description": "Convert Figma designs to production-ready React components with Tailwind CSS"
+    }
+  ]
+}

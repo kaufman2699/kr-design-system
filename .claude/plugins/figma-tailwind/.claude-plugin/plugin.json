@@ -1,0 +1,6 @@
+{
+  "name": "figma-tailwind",
+  "version": "1.0.0",
+  "description": "Figma-to-React component conversion using Tailwind CSS design tokens and MCP tools",
+  "skills": ["skills/figma-to-tailwind"]
+}
