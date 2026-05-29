@@ -654,8 +654,8 @@
     <!-- CONNECTING THE PLUGIN TO YOUR PROJECT -->
     <h2>Connecting to Your Project</h2>
 
-    <p>The <code>kr-design-system</code> plugin is hosted as a Git repository. To connect it to any project,
-      add two settings to the project's Claude Code configuration. No files to copy &mdash; Claude Code fetches and caches the plugin automatically.</p>
+    <p>The <code>kr-design-system</code> plugin can be loaded from a local directory or a GitHub repository.
+      Add two settings to the project's Claude Code configuration. No files to copy &mdash; Claude Code loads the plugin automatically.</p>
 
     <h3>Installation (One-Time per Project)</h3>
 
@@ -668,9 +668,46 @@
       <div class="step">
         <div class="step-num">2</div>
         <h4>Add the Marketplace + Plugin</h4>
-        <p>Paste the following JSON. This tells Claude Code where to find the plugin and enables it:</p>
+        <p>Choose one of the two options below. <strong>Option A</strong> is recommended for local development.</p>
       </div>
     </div>
+
+    <h3>Option A: Local Directory (Recommended)</h3>
+
+    <p>Point to the cloned <code>kr-design-system</code> repository on your machine:</p>
+
+    <pre><code>{
+  "extraKnownMarketplaces": {
+    "local-figma-tailwind": {
+      "source": {
+        "source": "directory",
+        "path": "/absolute/path/to/kr-design-system/.claude/plugins/figma-tailwind"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "figma-tailwind@local-figma-tailwind": true
+  }
+}</code></pre>
+
+    <div class="card highlight">
+      <p><strong>How it works:</strong></p>
+      <ul>
+        <li><code>extraKnownMarketplaces</code> &mdash; registers a named marketplace that Claude Code will search for plugins</li>
+        <li><code>"source": "directory"</code> &mdash; tells Claude Code to load plugins from a local path (no network needed)</li>
+        <li><code>"path"</code> &mdash; the <strong>absolute path</strong> to the plugin folder (the one containing <code>.claude-plugin/plugin.json</code>)</li>
+        <li><code>"figma-tailwind@local-figma-tailwind"</code> &mdash; the plugin name (<code>figma-tailwind</code>) <code>@</code> your marketplace name</li>
+      </ul>
+    </div>
+
+    <div class="card warning">
+      <p><strong>Important:</strong> The <code>path</code> must be an absolute path ending in <code>/.claude/plugins/figma-tailwind</code>.
+        Replace <code>/absolute/path/to/kr-design-system</code> with the actual location where you cloned this repo.</p>
+    </div>
+
+    <h3>Option B: GitHub (Remote Distribution)</h3>
+
+    <p>Once the repository is published to GitHub:</p>
 
     <pre><code>{
   "extraKnownMarketplaces": {
@@ -687,27 +724,30 @@
     <div class="card highlight">
       <p><strong>How it works:</strong></p>
       <ul>
-        <li><code>extraKnownMarketplaces</code> &mdash; tells Claude Code about the Git repo that contains plugins</li>
-        <li><code>"kr-design-system"</code> &mdash; the marketplace name (must match the <code>name</code> field in the repo's <code>marketplace.json</code>)</li>
+        <li><code>"source": "github"</code> &mdash; tells Claude Code to fetch the plugin from a GitHub repository</li>
+        <li><code>"repo"</code> &mdash; the GitHub <code>owner/repo</code> (must contain the <code>marketplace.json</code> at the expected path)</li>
+        <li><code>"kr-design-system"</code> &mdash; the marketplace name (must match the <code>name</code> field in <code>marketplace.json</code>)</li>
         <li><code>"figma-tailwind@kr-design-system"</code> &mdash; the plugin name <code>@</code> marketplace name</li>
       </ul>
     </div>
+
+    <div class="card warning">
+      <p><strong>Private repo?</strong> If the <code>kr-design-system</code> repository is private, ensure your Git credentials (SSH key or token) have read access. Claude Code uses your local Git configuration to clone the repo.</p>
+    </div>
+
+    <h3>Verify the Installation</h3>
 
     <div class="step-grid">
       <div class="step">
         <div class="step-num">3</div>
         <h4>Restart Claude Code</h4>
-        <p>Start a new Claude Code session in the project. Claude will fetch and cache the plugin. The <code>figma-to-tailwind</code> skill appears in the available skills list automatically.</p>
+        <p>Start a new Claude Code session in the project. The <code>figma-to-tailwind</code> skill appears in the available skills list automatically.</p>
       </div>
       <div class="step">
         <div class="step-num">4</div>
         <h4>Verify</h4>
         <p>Ask Claude: <code>"What skills do you have for Figma?"</code> &mdash; it should mention <code>figma-to-tailwind</code>.</p>
       </div>
-    </div>
-
-    <div class="card warning">
-      <p><strong>Private repo?</strong> If the <code>kr-design-system</code> repository is private, ensure your Git credentials (SSH key or token) have read access. Claude Code uses your local Git configuration to clone the repo.</p>
     </div>
 
     <h3>What the Skill Does</h3>
@@ -758,7 +798,10 @@
 
     <p>After installation, run the audit script to check for gaps between your CSS custom properties and Tailwind config:</p>
 
-    <pre><code># From your project root (after plugin is cached):
+    <pre><code># Using the local directory path:
+bash /path/to/kr-design-system/.claude/plugins/figma-tailwind/skills/figma-to-tailwind/scripts/audit-tokens.sh .
+
+# Or if you know where Claude Code cached the plugin:
 bash ~/.claude/plugins/cache/kr-design-system/*/skills/figma-to-tailwind/scripts/audit-tokens.sh .</code></pre>
 
     <p>This reports any CSS variables not referenced in <code>tailwind.config.js</code> and lists all color extensions.</p>

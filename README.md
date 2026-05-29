@@ -24,7 +24,33 @@ kr-design-system/
 
 ## Installation
 
-Add to any project's `.claude/settings.local.json` (or `.claude/settings.json` if you want it checked into the repo):
+Add to any project's `.claude/settings.local.json` (or `.claude/settings.json` if you want it checked into the repo).
+
+### Option A: Local directory (recommended for development)
+
+Point directly to the cloned repo on your machine:
+
+```json
+{
+  "extraKnownMarketplaces": {
+    "local-figma-tailwind": {
+      "source": {
+        "source": "directory",
+        "path": "/absolute/path/to/kr-design-system/.claude/plugins/figma-tailwind"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "figma-tailwind@local-figma-tailwind": true
+  }
+}
+```
+
+> **Replace** the `path` value with the absolute path to where you cloned this repository, ending in `/.claude/plugins/figma-tailwind`.
+
+### Option B: GitHub (for remote distribution)
+
+Once the repository is published to GitHub:
 
 ```json
 {
@@ -42,14 +68,18 @@ Add to any project's `.claude/settings.local.json` (or `.claude/settings.json` i
 
 > **Replace** `kaufman2699/kr-design-system` with the actual GitHub `owner/repo` where this repository is hosted.
 
-Start a new Claude Code session — the plugin is fetched, cached, and the `figma-to-tailwind` skill becomes available automatically.
+---
+
+Start a new Claude Code session — the plugin is loaded and the `figma-to-tailwind` skill becomes available automatically.
 
 ### How the naming connects
 
 | Setting | Value | Matches |
 |---|---|---|
-| `extraKnownMarketplaces` key | `kr-design-system` | `marketplace.json` → `"name": "kr-design-system"` |
-| `enabledPlugins` key | `figma-tailwind@kr-design-system` | `plugin.json` → `"name": "figma-tailwind"` @ marketplace name |
+| `extraKnownMarketplaces` key | your marketplace name (e.g. `local-figma-tailwind` or `kr-design-system`) | used as the `@marketplace` suffix |
+| `source.path` (Option A) | absolute path to the plugin directory | must end at the folder containing `.claude-plugin/plugin.json` |
+| `source.repo` (Option B) | GitHub `owner/repo` | `marketplace.json` → `"name": "kr-design-system"` |
+| `enabledPlugins` key | `figma-tailwind@<marketplace-name>` | `plugin.json` → `"name": "figma-tailwind"` @ marketplace name |
 
 ## What It Does
 
@@ -82,7 +112,11 @@ The skill activates when you say:
 Run the included script to check for gaps between CSS custom properties and Tailwind config:
 
 ```bash
+# From the kr-design-system repo root:
 bash .claude/plugins/figma-tailwind/skills/figma-to-tailwind/scripts/audit-tokens.sh /path/to/project
+
+# Or from any directory using the absolute path:
+bash /path/to/kr-design-system/.claude/plugins/figma-tailwind/skills/figma-to-tailwind/scripts/audit-tokens.sh /path/to/project
 ```
 
 ## Designer Guide
