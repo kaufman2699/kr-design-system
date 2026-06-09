@@ -3,27 +3,30 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Figma to React &mdash; Designer Guide</title>
+  <title>Figma to React &mdash; Component Generation Guide</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --navy: #1D4C7E;
+      --navy: #1E4C7E;
       --navy-light: #2A6299;
       --navy-dark: #153A61;
       --lime: #AED136;
       --lime-light: #B5DD5A;
       --lime-dark: #7FB01E;
+      --destructive: #FF6158;
       --bg: #F9FAFB;
       --fg: #4B5563;
       --muted: #6B7280;
       --border: #E5E7EB;
       --card: #FFFFFF;
-      --radius: 10px;
+      --radius: 8px;
+      --radius-sm: 4px;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: "Inter", system-ui, sans-serif;
       background: var(--bg);
       color: var(--fg);
       line-height: 1.6;
@@ -41,6 +44,7 @@
     }
 
     header h1 {
+      font-family: "Roboto", "Inter", system-ui, sans-serif;
       font-size: 2rem;
       color: var(--navy);
       margin-bottom: 0.5rem;
@@ -58,13 +62,14 @@
       font-size: 0.75rem;
       font-weight: 700;
       padding: 0.2em 0.6em;
-      border-radius: 4px;
+      border-radius: var(--radius-sm);
       text-transform: uppercase;
       margin-left: 0.5rem;
       vertical-align: middle;
     }
 
     h2 {
+      font-family: "Roboto", "Inter", system-ui, sans-serif;
       font-size: 1.4rem;
       color: var(--navy);
       margin: 2.5rem 0 1rem;
@@ -101,6 +106,11 @@
     .card.warning {
       border-left: 4px solid #F59E0B;
       background: #FFFBEB;
+    }
+
+    .card.info {
+      border-left: 4px solid var(--navy);
+      background: #EEF4FA;
     }
 
     .step-grid {
@@ -150,7 +160,7 @@
     code {
       background: #EEF2F7;
       padding: 0.15em 0.4em;
-      border-radius: 4px;
+      border-radius: var(--radius-sm);
       font-size: 0.85em;
       font-family: "SF Mono", "Fira Code", monospace;
       color: var(--navy-dark);
@@ -204,7 +214,7 @@
     .flow-box {
       background: var(--card);
       border: 2px solid var(--navy);
-      border-radius: 8px;
+      border-radius: var(--radius);
       padding: 0.6rem 1rem;
       font-size: 0.85rem;
       font-weight: 600;
@@ -246,14 +256,28 @@
     }
 
     .checklist li::before {
-      content: "";
+      content: "✓";
       position: absolute;
       left: 0;
-      top: 0.55rem;
-      width: 16px;
-      height: 16px;
-      border: 2px solid var(--border);
-      border-radius: 3px;
+      top: 0.4rem;
+      width: 18px;
+      height: 18px;
+      color: var(--lime-dark);
+      font-weight: 700;
+    }
+
+    .phase-label {
+      display: inline-block;
+      background: var(--navy);
+      color: white;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 0.15em 0.5em;
+      border-radius: var(--radius-sm);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-right: 0.4rem;
+      vertical-align: middle;
     }
 
     footer {
@@ -264,358 +288,694 @@
       padding-top: 1.5rem;
       border-top: 1px solid var(--border);
     }
+
+    @media (max-width: 600px) {
+      .flow-diagram { flex-direction: column; }
+      .flow-arrow { transform: rotate(90deg); }
+    }
   </style>
 </head>
 <body>
   <div class="container">
 
     <header>
-      <h1>Figma to React Components <span class="badge">Tailwind</span></h1>
-      <p>A designer's guide to converting Figma pages into production-ready React components</p>
+      <h1>Figma &rarr; React Components <span class="badge">Tailwind + Storybook</span></h1>
+      <p>Generate production-ready React components from Figma designs, automatically added to the shared component library with Storybook stories.</p>
     </header>
 
-    <!-- OVERVIEW -->
-    <h2>How It Works</h2>
-
-    <div class="flow-diagram">
-      <div class="flow-box">Figma Design</div>
-      <span class="flow-arrow">&rarr;</span>
-      <div class="flow-box active">MCP Tools</div>
-      <span class="flow-arrow">&rarr;</span>
-      <div class="flow-box">React + Tailwind</div>
-      <span class="flow-arrow">&rarr;</span>
-      <div class="flow-box">Production Component</div>
-    </div>
+    <!-- TL;DR -->
+    <h2>Quick Start &mdash; 5 Steps to Generate a Component</h2>
 
     <div class="card highlight">
-      <p><strong>What you'll get:</strong> A fully typed React component using Tailwind CSS utility classes,
-        matching the project's design token system and component patterns. No CSS files, no inline styles &mdash;
-        just clean utility-first components.</p>
-    </div>
-
-    <!-- PREREQUISITES -->
-    <h2>Prerequisites</h2>
-
-    <ul>
-      <li><strong>Figma Desktop App</strong> (not browser) with Dev Mode access</li>
-      <li><strong>Claude Code</strong> CLI installed and configured</li>
-      <li><strong>Node.js</strong> 18+ with the project cloned locally</li>
-      <li>Access to the project's Figma design file</li>
-    </ul>
-
-    <!-- SETUP -->
-    <h2>One-Time Setup</h2>
-
-    <h3>Step 1: Enable Figma Dev Mode MCP</h3>
-
-    <div class="step-grid">
-      <div class="step">
-        <div class="step-num">1</div>
-        <h4>Open Figma Desktop</h4>
-        <p>Launch the Figma desktop app and open the project's design file.</p>
-      </div>
-      <div class="step">
-        <div class="step-num">2</div>
-        <h4>Enable Dev Mode</h4>
-        <p>Toggle Dev Mode using the switch in the top-right toolbar (or press <code>Shift+D</code>).</p>
-      </div>
-      <div class="step">
-        <div class="step-num">3</div>
-        <h4>Install Dev Mode MCP Plugin</h4>
-        <p>In Figma, go to <strong>Plugins &rarr; Search</strong> and find "Dev Mode MCP". Install and enable it. This starts a local server on port 3845.</p>
-      </div>
-      <div class="step">
-        <div class="step-num">4</div>
-        <h4>Verify Connection</h4>
-        <p>In your project's <code>.claude/settings.json</code>, add the MCP server config (see below). Then ask Claude to call <code>get_metadata</code> on a selected element to confirm connectivity.</p>
-      </div>
-    </div>
-
-    <div class="card">
-      <p><strong>MCP server config</strong> &mdash; add to your project's <code>.claude/settings.json</code>:</p>
-      <pre><code>{
-  "mcpServers": {
-    "figma-dev-mode": {
-      "type": "http",
-      "url": "http://127.0.0.1:3845/mcp"
-    }
-  }
-}</code></pre>
-    </div>
-
-    <h3>Step 2: Authenticate Figma MCP (OAuth)</h3>
-
-    <div class="step-grid">
-      <div class="step">
-        <div class="step-num">1</div>
-        <h4>Start Auth Flow</h4>
-        <p>In Claude Code, type: <code>"Authenticate with Figma"</code>. Claude will provide an authorization URL.</p>
-      </div>
-      <div class="step">
-        <div class="step-num">2</div>
-        <h4>Complete Login</h4>
-        <p>Open the URL in your browser and log in to Figma. Approve the MCP connection.</p>
-      </div>
-      <div class="step">
-        <div class="step-num">3</div>
-        <h4>Confirm</h4>
-        <p>If the redirect page shows an error, copy the full URL from your address bar and paste it back to Claude.</p>
-      </div>
-    </div>
-
-    <div class="card warning">
-      <p><strong>Note:</strong> The Figma Dev Mode MCP requires the Figma Desktop app to be open with Dev Mode active.
-        If you close Figma, the local server at <code>http://127.0.0.1:3845</code> will stop and tools will be unavailable until you reopen it.</p>
-    </div>
-
-    <!-- USAGE WORKFLOW -->
-    <h2>Converting a Page: Step by Step</h2>
-
-    <h3>Phase 1: Share the Design</h3>
-
-    <div class="card">
-      <p><strong>Copy the Figma URL</strong> of the page or frame you want to convert. The URL must include the <code>node-id</code> parameter:</p>
-      <pre><code>https://figma.com/design/ABC123/MyFile?node-id=45-678</code></pre>
-      <p>To get this: right-click the frame in Figma &rarr; <strong>Copy link to selection</strong>.</p>
-      <p>Then paste it to Claude Code with a request like:</p>
-      <pre><code>"Convert this Figma page to React components: [paste URL]"</code></pre>
-    </div>
-
-    <h3>Phase 2: Automatic Extraction</h3>
-
-    <p>Claude will automatically run these MCP tools in sequence:</p>
-
-    <table>
-      <tr>
-        <th>Tool</th>
-        <th>What It Does</th>
-      </tr>
-      <tr>
-        <td><code>get_screenshot</code></td>
-        <td>Captures the visual reference for comparison</td>
-      </tr>
-      <tr>
-        <td><code>get_variable_defs</code></td>
-        <td>Extracts design tokens (colors, spacing, typography)</td>
-      </tr>
-      <tr>
-        <td><code>get_code_connect_map</code></td>
-        <td>Checks which Figma components already have code equivalents</td>
-      </tr>
-      <tr>
-        <td><code>get_design_context</code></td>
-        <td>Generates React + Tailwind code from the design</td>
-      </tr>
-    </table>
-
-    <h3>Phase 3: Code Generation</h3>
-
-    <p>The raw generated code is transformed to match the project's conventions:</p>
-
-    <table>
-      <tr>
-        <th>Convention</th>
-        <th>What Claude Applies</th>
-      </tr>
-      <tr>
-        <td>TypeScript</td>
-        <td>Typed props interface extending HTML attributes</td>
-      </tr>
-      <tr>
-        <td><code>cn()</code> utility</td>
-        <td>All classNames wrapped for merge support</td>
-      </tr>
-      <tr>
-        <td>Design tokens</td>
-        <td>Hex colors replaced with <code>firm-navy</code>, <code>var(--border)</code>, etc.</td>
-      </tr>
-      <tr>
-        <td><code>forwardRef</code></td>
-        <td>Base components support ref forwarding</td>
-      </tr>
-      <tr>
-        <td>Variant pattern</td>
-        <td>Visual states defined as <code>variantClasses</code> object</td>
-      </tr>
-      <tr>
-        <td>Icons</td>
-        <td>Replaced with <code>&lt;Icon name="..." /&gt;</code> component</td>
-      </tr>
-    </table>
-
-    <h3>Phase 4: Visual Verification</h3>
-
-    <div class="card">
-      <p>After implementation, Claude will:</p>
       <ol>
-        <li>Run <code>npm run build</code> to verify no TypeScript errors</li>
-        <li>Compare the rendered component against the Figma screenshot</li>
-        <li>Check responsive behavior at mobile / tablet / desktop</li>
-        <li>Verify hover, focus, and disabled states</li>
+        <li>Copy a Figma frame URL (right-click &rarr; Copy link to selection)</li>
+        <li>Open Claude Code in the <code>kr-design-system</code> project</li>
+        <li>Paste the URL and say: <strong>"Convert this to a React component"</strong></li>
+        <li>Claude generates the component + Storybook story + updates the barrel export</li>
+        <li>Run <code>pnpm dev</code> to see it in Storybook at <code>localhost:6006</code></li>
       </ol>
     </div>
 
-    <!-- DESIGN TOKENS -->
-    <h2>Design Token Reference (Firm Brand Defaults)</h2>
+    <!-- HOW IT WORKS -->
+    <h2>How It Works</h2>
 
-    <p>These are the default Kaufman Rossin / Firm brand tokens included with the skill. The converter uses your project's
-      actual <code>tailwind.config.js</code> at runtime &mdash; these serve as the fallback when no project tokens are found.</p>
+    <div class="flow-diagram">
+      <div class="flow-box">Figma URL</div>
+      <span class="flow-arrow">&rarr;</span>
+      <div class="flow-box active">Claude Code + Figma MCP</div>
+      <span class="flow-arrow">&rarr;</span>
+      <div class="flow-box">React + Tailwind Component</div>
+      <span class="flow-arrow">&rarr;</span>
+      <div class="flow-box">Storybook + npm Package</div>
+    </div>
 
+    <p>The workflow is automated by a Claude Code skill called <code>figma-to-tailwind</code>. When you paste a Figma URL, it:</p>
+
+    <table>
+      <tr>
+        <th>Phase</th>
+        <th>What Happens Automatically</th>
+      </tr>
+      <tr>
+        <td><span class="phase-label">1</span> Discovery</td>
+        <td>Screenshots the design, extracts structure and tokens via Figma MCP</td>
+      </tr>
+      <tr>
+        <td><span class="phase-label">2</span> Token Mapping</td>
+        <td>Maps Figma colors/spacing to <code>firm-navy</code>, <code>firm-lime</code>, etc.</td>
+      </tr>
+      <tr>
+        <td><span class="phase-label">3</span> Code Gen</td>
+        <td>Generates TypeScript React component with <code>forwardRef</code>, <code>cn()</code>, variants</td>
+      </tr>
+      <tr>
+        <td><span class="phase-label">4A</span> File Placement</td>
+        <td>Saves to <code>src/components/ui/component-name.tsx</code></td>
+      </tr>
+      <tr>
+        <td><span class="phase-label">4B</span> Storybook Story</td>
+        <td>Generates <code>.stories.tsx</code> with controls for all variants/sizes</td>
+      </tr>
+      <tr>
+        <td><span class="phase-label">4C</span> Barrel Export</td>
+        <td>Adds the component to <code>src/components/ui/index.ts</code> so it's importable from the package</td>
+      </tr>
+      <tr>
+        <td><span class="phase-label">5</span> Verification</td>
+        <td>Runs <code>pnpm typecheck</code> + <code>pnpm build</code>, checks Storybook renders</td>
+      </tr>
+    </table>
+
+    <!-- PREREQUISITES -->
+    <h2>Prerequisites (One-Time Setup)</h2>
+
+    <p>Follow these steps to set up your machine from scratch. If you already have some of these installed, skip to the next step.</p>
+
+    <h3>1. Install Node.js (v24)</h3>
+
+    <div class="card">
+      <p>Download and install <strong>Node.js v24</strong> (latest stable) from <strong>https://nodejs.org</strong>, or use a version manager:</p>
+      <pre><code># Using nvm (macOS/Linux)
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.0/install.sh | bash
+nvm install 24
+nvm use 24
+
+# Verify
+node --version   # Should show v24.x</code></pre>
+    </div>
+
+    <h3>2. Install pnpm (Package Manager)</h3>
+
+    <div class="card">
+      <p>This project uses <strong>pnpm</strong> for fast, strict dependency management. Install it via corepack (built into Node.js):</p>
+      <pre><code># Enable pnpm via corepack (recommended)
+corepack enable pnpm
+
+# Verify
+pnpm --version   # Should show 11.x</code></pre>
+      <p>Alternative installation methods:</p>
+      <pre><code># Via npm (if corepack is unavailable)
+npm install -g pnpm
+
+# Via Homebrew (macOS)
+brew install pnpm
+
+# Via standalone script
+curl -fsSL https://get.pnpm.io/install.sh | sh -</code></pre>
+    </div>
+
+    <h3>3. Install Claude Code (AI CLI)</h3>
+
+    <div class="card">
+      <p><strong>Claude Code</strong> is the AI assistant that reads Figma designs and generates components. Install it globally:</p>
+      <pre><code># Install Claude Code
+npm install -g @anthropic-ai/claude-code
+
+# Verify
+claude --version</code></pre>
+      <p>On first run, Claude Code will ask you to log in with your Anthropic account.</p>
+    </div>
+
+    <div class="card warning">
+      <p><strong>Requires an Anthropic account</strong> with Claude Code access. If you don't have one, ask your team lead for an invitation or sign up at <strong>https://claude.ai</strong>.</p>
+    </div>
+
+    <h3>4. Clone and Install the Design System</h3>
+
+    <div class="card">
+      <pre><code># Clone the repository
+git clone https://github.com/kaufman2699/kr-design-system.git
+cd kr-design-system
+
+# Install dependencies
+pnpm install</code></pre>
+      <p>This installs React, Tailwind CSS, Storybook, tsup, and all other dependencies.</p>
+    </div>
+
+    <h3>5. Figma MCP (Automatic &mdash; No Extra Setup)</h3>
+
+    <div class="card info">
+      <p>The repo includes a <code>.mcp.json</code> file that configures the Figma MCP connection automatically. When you first use a Figma tool in Claude Code, it will open your browser for <strong>OAuth authentication</strong>. Just log in to Figma and approve the connection.</p>
+      <pre><code># The .mcp.json is already configured:
+{
+  "mcpServers": {
+    "Figma": {
+      "url": "https://mcp.figma.com/mcp"
+    }
+  }
+}</code></pre>
+      <p><strong>No API tokens needed.</strong> No Figma Desktop app required. Everything works through the browser.</p>
+    </div>
+
+    <h3>6. Verify Everything Works</h3>
+
+    <div class="step-grid">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h4>Build the project</h4>
+        <p>Run <code>pnpm build</code> — should complete without errors and produce files in <code>dist/</code>.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h4>Launch Storybook</h4>
+        <p>Run <code>pnpm dev</code> — opens at <code>http://localhost:6006</code>. You should see existing components (Button, Chip, etc.).</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h4>Test Claude Code + Figma</h4>
+        <p>In the project folder, run <code>claude</code> and type: <code>"Authenticate with Figma"</code>. Complete the browser login. Done!</p>
+      </div>
+    </div>
+
+    <div class="card highlight">
+      <p><strong>Setup complete!</strong> You're ready to convert Figma designs to React components. Continue to the next section.</p>
+    </div>
+
+    <!-- STEP BY STEP USAGE -->
+    <h2>Generating a Component: Step by Step</h2>
+
+    <h3>Step 1: Get the Figma URL</h3>
+
+    <div class="card">
+      <p>In Figma (browser or desktop), select the frame you want to convert:</p>
+      <ol>
+        <li>Right-click the frame &rarr; <strong>Copy link to selection</strong></li>
+        <li>The URL must include <code>node-id</code>:</li>
+      </ol>
+      <pre><code>https://www.figma.com/design/YOUR_FILE_KEY/FileName?node-id=123-456&m=dev</code></pre>
+    </div>
+
+    <div class="card warning">
+      <p><strong>Important:</strong> Select a <em>single frame or component</em>, not the entire page. One frame = one component. For complex pages, convert section by section.</p>
+    </div>
+
+    <h3>Step 2: Paste into Claude Code</h3>
+
+    <div class="card">
+      <p>Open Claude Code in the <code>kr-design-system</code> directory and type:</p>
+      <pre><code>Convert this Figma design to a React component:
+https://www.figma.com/design/YOUR_FILE_KEY/FileName?node-id=123-456&m=dev</code></pre>
+      <p>Or use any of these trigger phrases:</p>
+      <ul>
+        <li><code>"Generate component from Figma: [URL]"</code></li>
+        <li><code>"Create React component from this design: [URL]"</code></li>
+        <li><code>"Implement this Figma page: [URL]"</code></li>
+      </ul>
+    </div>
+
+    <h3>Step 3: Watch It Generate</h3>
+
+    <p>Claude will automatically:</p>
+
+    <div class="step-grid">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h4>Screenshot &amp; Analyze</h4>
+        <p>Captures the design visually and extracts structure, colors, fonts, spacing.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h4>Generate Component</h4>
+        <p>Creates a <code>.tsx</code> file following project conventions (TypeScript, forwardRef, cn(), variants).</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h4>Generate Storybook Story</h4>
+        <p>Creates a <code>.stories.tsx</code> file with interactive controls, all variants, and a link back to the Figma design.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <h4>Register in Package</h4>
+        <p>Adds the export to <code>src/components/ui/index.ts</code> so other apps can import it.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <h4>Verify</h4>
+        <p>Runs TypeScript check and build to confirm everything compiles.</p>
+      </div>
+    </div>
+
+    <h3>Step 4: Preview in Storybook</h3>
+
+    <p>After generation, launch Storybook to browse and test your new component:</p>
+
+    <div class="card highlight">
+      <h4 style="margin-bottom: 0.5rem; color: var(--navy);">Launch Storybook</h4>
+      <pre><code>pnpm dev</code></pre>
+      <p style="margin-top: 0.5rem;">This starts the Storybook dev server. Open your browser to:</p>
+      <p style="text-align: center; font-size: 1.1rem; font-weight: 600; margin: 0.75rem 0;"><code>http://localhost:6006</code></p>
+    </div>
+
+    <div class="step-grid">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h4>Find Your Component</h4>
+        <p>In the left sidebar, expand the <strong>UI</strong> section. Your new component appears alphabetically (e.g., <code>UI / ConfirmDialog</code>).</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h4>Test Variants</h4>
+        <p>Click individual stories (Default, Accent, Destructive) or use the <strong>Controls</strong> panel at the bottom to switch between variants and sizes in real time.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h4>Check the Docs</h4>
+        <p>Click <strong>Docs</strong> in the sidebar to see auto-generated documentation with the component's props table, all stories rendered together, and usage examples.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <h4>Compare with Figma</h4>
+        <p>Visually compare the rendered component with the original Figma design. If styles don't match, ask Claude to adjust.</p>
+      </div>
+    </div>
+
+    <div class="card info">
+      <p><strong>Hot reload:</strong> Storybook watches for file changes. If you or Claude modify the component, the browser updates automatically &mdash; no need to restart.</p>
+    </div>
+
+    <div class="card">
+      <p><strong>Other Storybook commands:</strong></p>
+      <table style="margin: 0.5rem 0;">
+        <tr>
+          <td><code>pnpm dev</code></td>
+          <td>Start Storybook dev server (port 6006)</td>
+        </tr>
+        <tr>
+          <td><code>pnpm build:storybook</code></td>
+          <td>Build static Storybook HTML (for deployment/sharing)</td>
+        </tr>
+        <tr>
+          <td><code>Ctrl+C</code></td>
+          <td>Stop the Storybook server</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- WHAT YOU GET -->
+    <h2>What Gets Generated</h2>
+
+    <p>For each Figma frame, Claude creates <strong>3 things</strong>:</p>
+
+    <table>
+      <tr>
+        <th>File</th>
+        <th>Purpose</th>
+        <th>Location</th>
+      </tr>
+      <tr>
+        <td><code>component-name.tsx</code></td>
+        <td>The React component with TypeScript types and Tailwind classes</td>
+        <td><code>src/components/ui/</code></td>
+      </tr>
+      <tr>
+        <td><code>component-name.stories.tsx</code></td>
+        <td>Storybook stories with variant controls and Figma design link</td>
+        <td><code>src/components/ui/</code></td>
+      </tr>
+      <tr>
+        <td><code>index.ts</code> (updated)</td>
+        <td>Barrel export so the component is importable from the package</td>
+        <td><code>src/components/ui/index.ts</code></td>
+      </tr>
+    </table>
+
+    <h3>Example: Generated Component</h3>
+
+    <pre><code>// src/components/ui/confirm-dialog.tsx
+import * as React from "react";
+import { cn } from "../../lib/utils";
+import { Button } from "./button";
+
+export interface ConfirmDialogProps extends React.HTMLAttributes&lt;HTMLDivElement&gt; {
+  title: string;
+  description: React.ReactNode;
+  confirmLabel?: string;
+  cancelLabel?: string;
+  variant?: "destructive" | "default" | "accent";
+  onConfirm?: () =&gt; void;
+  onCancel?: () =&gt; void;
+}
+
+export const ConfirmDialog = React.forwardRef&lt;HTMLDivElement, ConfirmDialogProps&gt;(
+  ({ className, title, description, variant = "destructive", ... }, ref) =&gt; (
+    &lt;div ref={ref} className={cn("rounded-firm border ...", className)}&gt;
+      &lt;h2 className="font-heading text-firm-navy ..."&gt;{title}&lt;/h2&gt;
+      &lt;p className="font-sans text-firm-foreground ..."&gt;{description}&lt;/p&gt;
+      &lt;div className="flex justify-end gap-3"&gt;
+        &lt;Button variant="outline" onClick={onCancel}&gt;Cancel&lt;/Button&gt;
+        &lt;Button variant={variant} onClick={onConfirm}&gt;Confirm&lt;/Button&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  ),
+);
+ConfirmDialog.displayName = "ConfirmDialog";</code></pre>
+
+    <h3>Example: Generated Story</h3>
+
+    <pre><code>// src/components/ui/confirm-dialog.stories.tsx
+import type { Meta, StoryObj } from "@storybook/react";
+import { ConfirmDialog } from "./confirm-dialog";
+
+const meta = {
+  title: "UI/ConfirmDialog",
+  component: ConfirmDialog,
+  tags: ["autodocs"],
+  parameters: {
+    design: { type: "figma", url: "https://figma.com/design/.../...?node-id=253-1150" },
+  },
+} satisfies Meta&lt;typeof ConfirmDialog&gt;;
+
+export default meta;
+
+export const Destructive: StoryObj = {
+  args: { title: "Delete chat?", confirmLabel: "Delete", variant: "destructive" },
+};</code></pre>
+
+    <!-- PUBLISHING -->
+    <h2>Publishing the Package to npm</h2>
+
+    <p>After generating and reviewing components in Storybook, publish the package so other apps in the organization can use it.</p>
+
+    <h3>First-Time Setup (One per Machine)</h3>
+
+    <div class="step-grid">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h4>Create a GitHub Personal Access Token</h4>
+        <p>Go to <strong>GitHub &rarr; Settings &rarr; Developer settings &rarr; Personal access tokens &rarr; Tokens (classic)</strong>. Create a token with <code>write:packages</code> and <code>read:packages</code> scopes.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h4>Authenticate with GitHub Packages</h4>
+        <p>Run this command and paste your token when prompted for the password:</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <pre><code># Log in to GitHub Packages npm registry
+npm login --registry=https://npm.pkg.github.com
+
+# Username: your GitHub username
+# Password: paste your Personal Access Token
+# Email: your email</code></pre>
+    </div>
+
+    <h3>Publishing a New Version</h3>
+
+    <div class="step-grid">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h4>Verify the Build</h4>
+        <p>Make sure everything compiles and looks correct in Storybook before publishing.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h4>Bump the Version</h4>
+        <p>Update the version number in <code>package.json</code> following semver rules.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h4>Publish</h4>
+        <p>Run the publish command &mdash; it builds automatically before publishing.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <pre><code># 1. Verify build works
+pnpm build
+
+# 2. Bump the version (choose one)
+pnpm version patch    # 0.1.0 → 0.1.1 (bug fixes, small tweaks)
+pnpm version minor    # 0.1.0 → 0.2.0 (new components added)
+pnpm version major    # 0.1.0 → 1.0.0 (breaking changes)
+
+# 3. Publish to GitHub Packages
+pnpm publish</code></pre>
+    </div>
+
+    <div class="card info">
+      <p><strong>What happens when you run <code>pnpm publish</code>:</strong></p>
+      <ol>
+        <li>Runs <code>pnpm build</code> automatically (via <code>prepublishOnly</code> script)</li>
+        <li>Packages the <code>dist/</code> folder and <code>tailwind.config.ts</code></li>
+        <li>Uploads to GitHub Packages at <code>https://npm.pkg.github.com</code></li>
+        <li>Only accessible by members of the <code>@kaufman-rossin</code> GitHub organization</li>
+      </ol>
+    </div>
+
+    <h3>Version Guidelines</h3>
+
+    <table>
+      <tr>
+        <th>Change Type</th>
+        <th>Version Bump</th>
+        <th>Example</th>
+      </tr>
+      <tr>
+        <td>Fix a component's styling or bug</td>
+        <td><code>patch</code></td>
+        <td>0.1.0 &rarr; 0.1.1</td>
+      </tr>
+      <tr>
+        <td>Add new components from Figma</td>
+        <td><code>minor</code></td>
+        <td>0.1.0 &rarr; 0.2.0</td>
+      </tr>
+      <tr>
+        <td>Rename/remove a component or change its props</td>
+        <td><code>major</code></td>
+        <td>0.2.0 &rarr; 1.0.0</td>
+      </tr>
+    </table>
+
+    <div class="card warning">
+      <p><strong>Always bump the version before publishing!</strong> npm will reject the publish if you try to publish the same version twice. If you forget, you'll see: <code>Cannot publish over the previously published versions</code>. Run <code>pnpm version patch</code> (or minor/major) first.</p>
+    </div>
+
+    <div class="card warning">
+      <p><strong>Don't forget to commit before publishing.</strong> Run <code>git add . && git commit -m "feat: add new components"</code> and push your changes. The version bump creates a commit automatically.</p>
+    </div>
+
+    <!-- CONSUMING THE PACKAGE -->
+    <h2>Using Components in Your App</h2>
+
+    <p>After components are generated and the package is published, other apps in the org consume them via:</p>
+
+    <h3>1. Install the Package</h3>
+
+    <div class="card">
+      <p>Add to your app's <code>.npmrc</code> (one-time):</p>
+      <pre><code>@kaufman-rossin:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}</code></pre>
+      <p>Then install:</p>
+      <pre><code>pnpm add @kaufman-rossin/kr-design-system</code></pre>
+    </div>
+
+    <h3>2. Import Components</h3>
+
+    <pre><code>// Import the pre-built styles (once, in your app entry)
+import "@kaufman-rossin/kr-design-system/styles.css";
+
+// Import components
+import { Button, ConfirmDialog } from "@kaufman-rossin/kr-design-system";</code></pre>
+
+    <!-- DESIGN TOKEN REFERENCE -->
+    <h2>Design Token Reference</h2>
+
+    <p>The converter automatically maps Figma values to these tokens. Designers should use these colors as Figma variables for best results.</p>
+
+    <h3>Colors</h3>
     <table>
       <tr>
         <th>Token</th>
         <th>Value</th>
         <th>Tailwind Class</th>
+        <th>Usage</th>
       </tr>
       <tr>
-        <td><span class="token-swatch" style="background:#1D4C7E"></span>Navy</td>
-        <td><code>#1D4C7E</code></td>
-        <td><code>text-firm-navy</code> / <code>bg-firm-navy</code></td>
-      </tr>
-      <tr>
-        <td><span class="token-swatch" style="background:#2A6299"></span>Navy Light</td>
-        <td><code>#2A6299</code></td>
-        <td><code>text-firm-navy-light</code> / <code>bg-firm-navy-light</code></td>
-      </tr>
-      <tr>
-        <td><span class="token-swatch" style="background:#153A61"></span>Navy Dark</td>
-        <td><code>#153A61</code></td>
-        <td><code>text-firm-navy-dark</code> / <code>bg-firm-navy-dark</code></td>
+        <td><span class="token-swatch" style="background:#1E4C7E"></span>Navy</td>
+        <td><code>#1E4C7E</code></td>
+        <td><code>firm-navy</code></td>
+        <td>Primary buttons, headings</td>
       </tr>
       <tr>
         <td><span class="token-swatch" style="background:#AED136"></span>Lime</td>
         <td><code>#AED136</code></td>
-        <td><code>text-firm-lime</code> / <code>bg-firm-lime</code></td>
+        <td><code>firm-lime</code></td>
+        <td>Accent buttons, focus rings</td>
       </tr>
       <tr>
-        <td><span class="token-swatch" style="background:#B5DD5A"></span>Lime Light</td>
-        <td><code>#B5DD5A</code></td>
-        <td><code>text-firm-lime-light</code> / <code>bg-firm-lime-light</code></td>
-      </tr>
-      <tr>
-        <td><span class="token-swatch" style="background:#7FB01E"></span>Lime Dark</td>
-        <td><code>#7FB01E</code></td>
-        <td><code>text-firm-lime-dark</code> / <code>bg-firm-lime-dark</code></td>
-      </tr>
-      <tr>
-        <td><span class="token-swatch" style="background:#F9FAFB"></span>Background</td>
-        <td><code>#F9FAFB</code></td>
-        <td><code>bg-[var(--background)]</code></td>
+        <td><span class="token-swatch" style="background:#FF6158"></span>Destructive</td>
+        <td><code>#FF6158</code></td>
+        <td><code>firm-destructive</code></td>
+        <td>Delete/danger actions</td>
       </tr>
       <tr>
         <td><span class="token-swatch" style="background:#4B5563"></span>Foreground</td>
         <td><code>#4B5563</code></td>
-        <td><code>text-firm-foreground</code></td>
+        <td><code>firm-foreground</code></td>
+        <td>Body text</td>
       </tr>
       <tr>
-        <td><span class="token-swatch" style="background:#6B7280"></span>Muted</td>
-        <td><code>#6B7280</code></td>
-        <td><code>text-[var(--muted-foreground)]</code></td>
+        <td><span class="token-swatch" style="background:#F2F2F2"></span>Muted</td>
+        <td><code>#F2F2F2</code></td>
+        <td><code>firm-muted</code></td>
+        <td>Secondary button backgrounds</td>
       </tr>
       <tr>
         <td><span class="token-swatch" style="background:#E5E7EB"></span>Border</td>
         <td><code>#E5E7EB</code></td>
-        <td><code>border-[var(--border)]</code></td>
+        <td><code>firm-border</code></td>
+        <td>Card borders, dividers</td>
+      </tr>
+      <tr>
+        <td><span class="token-swatch" style="background:#C4C4C4"></span>Input Border</td>
+        <td><code>#C4C4C4</code></td>
+        <td><code>var(--input-border)</code></td>
+        <td>Outline button borders, form inputs</td>
       </tr>
     </table>
 
-    <!-- LAYOUT MAPPING -->
-    <h2>Figma &rarr; Tailwind Layout Mapping</h2>
+    <h3>Typography</h3>
+    <table>
+      <tr>
+        <th>Usage</th>
+        <th>Font</th>
+        <th>Tailwind Class</th>
+      </tr>
+      <tr>
+        <td>Headings, titles, dialogs</td>
+        <td>Roboto Bold</td>
+        <td><code>font-heading font-bold</code></td>
+      </tr>
+      <tr>
+        <td>Body text, descriptions</td>
+        <td>Inter Regular</td>
+        <td><code>font-sans</code> (default)</td>
+      </tr>
+      <tr>
+        <td>Buttons, labels</td>
+        <td>Inter SemiBold</td>
+        <td><code>font-sans font-semibold</code></td>
+      </tr>
+    </table>
 
-    <p>When designing in Figma, use Auto Layout. Here's how it translates:</p>
+    <h3>Border Radius</h3>
+    <table>
+      <tr>
+        <th>Usage</th>
+        <th>Value</th>
+        <th>Tailwind Class</th>
+      </tr>
+      <tr>
+        <td>Cards, dialogs, containers</td>
+        <td>8px</td>
+        <td><code>rounded-firm</code></td>
+      </tr>
+      <tr>
+        <td>Buttons, inputs, small elements</td>
+        <td>4px</td>
+        <td><code>rounded-firm-sm</code></td>
+      </tr>
+    </table>
+
+    <!-- TIPS -->
+    <h2>Tips for Best Results</h2>
+
+    <div class="card highlight">
+      <h3>For Designers (in Figma)</h3>
+      <ul>
+        <li><strong>Use Auto Layout</strong> &mdash; it maps directly to Flexbox. Avoid absolute positioning.</li>
+        <li><strong>Use Figma Variables</strong> for colors &mdash; named variables map to tokens automatically.</li>
+        <li><strong>Name layers meaningfully</strong> &mdash; "DeleteButton", not "Rectangle 47".</li>
+        <li><strong>Keep components atomic</strong> &mdash; one frame = one component. Split complex pages into sections.</li>
+        <li><strong>Define all states</strong> &mdash; if a button has hover/disabled states, create Figma variants for them.</li>
+      </ul>
+    </div>
+
+    <div class="card highlight">
+      <h3>For Developers (in Claude Code)</h3>
+      <ul>
+        <li><strong>One frame at a time</strong> &mdash; convert individual components, not entire pages at once.</li>
+        <li><strong>Mention interactions</strong> &mdash; tell Claude about hover effects, animations, or conditional behavior.</li>
+        <li><strong>Reference existing components</strong> &mdash; say "use the existing Button" if you see one already in the library.</li>
+        <li><strong>Check Storybook after generation</strong> &mdash; run <code>pnpm dev</code> to visually verify.</li>
+        <li><strong>Publish after review</strong> &mdash; run <code>pnpm publish</code> to push to GitHub Packages when ready.</li>
+      </ul>
+    </div>
+
+    <!-- COMMON COMMANDS -->
+    <h2>Common Commands</h2>
 
     <table>
       <tr>
-        <th>Figma Auto Layout</th>
-        <th>Tailwind CSS</th>
+        <th>Command</th>
+        <th>What It Does</th>
       </tr>
       <tr>
-        <td>Direction: Horizontal</td>
-        <td><code>flex</code> (row is default)</td>
+        <td><code>pnpm dev</code></td>
+        <td>Launches Storybook at localhost:6006</td>
       </tr>
       <tr>
-        <td>Direction: Vertical</td>
-        <td><code>flex flex-col</code></td>
+        <td><code>pnpm build</code></td>
+        <td>Builds the package (ESM + CJS + types + CSS)</td>
       </tr>
       <tr>
-        <td>Gap: 4 / 8 / 12 / 16 / 24</td>
-        <td><code>gap-1</code> / <code>gap-2</code> / <code>gap-3</code> / <code>gap-4</code> / <code>gap-6</code></td>
+        <td><code>pnpm typecheck</code></td>
+        <td>Runs TypeScript compiler to check for errors</td>
       </tr>
       <tr>
-        <td>Padding: 8 / 12 / 16 / 24 / 32</td>
-        <td><code>p-2</code> / <code>p-3</code> / <code>p-4</code> / <code>p-6</code> / <code>p-8</code></td>
+        <td><code>pnpm build:storybook</code></td>
+        <td>Builds static Storybook for deployment</td>
       </tr>
       <tr>
-        <td>Alignment: Center</td>
-        <td><code>items-center</code></td>
-      </tr>
-      <tr>
-        <td>Distribution: Space Between</td>
-        <td><code>justify-between</code></td>
-      </tr>
-      <tr>
-        <td>Child: Fill Container</td>
-        <td><code>w-full</code> or <code>flex-1</code></td>
-      </tr>
-      <tr>
-        <td>Child: Hug Contents</td>
-        <td>(no width class needed)</td>
-      </tr>
-      <tr>
-        <td>Child: Fixed 300px</td>
-        <td><code>w-[300px]</code></td>
-      </tr>
-      <tr>
-        <td>Corner Radius: 10</td>
-        <td><code>rounded-[var(--radius)]</code></td>
-      </tr>
-      <tr>
-        <td>Corner Radius: 8 / 12 / 16</td>
-        <td><code>rounded-lg</code> / <code>rounded-xl</code> / <code>rounded-2xl</code></td>
+        <td><code>pnpm publish</code></td>
+        <td>Publishes to GitHub Packages (builds first automatically)</td>
       </tr>
     </table>
 
-    <!-- TIPS FOR DESIGNERS -->
-    <h2>Tips for Better Conversions</h2>
+    <!-- PROJECT STRUCTURE -->
+    <h2>Project Structure</h2>
 
-    <div class="card highlight">
-      <h3>In Figma</h3>
-      <ul>
-        <li><strong>Use Auto Layout everywhere</strong> &mdash; it maps directly to Flexbox. Absolute positioning requires manual adjustment.</li>
-        <li><strong>Name your layers meaningfully</strong> &mdash; layer names become component/variable names in code.</li>
-        <li><strong>Use design variables</strong> &mdash; color/spacing variables map to Tailwind tokens automatically.</li>
-        <li><strong>Keep components atomic</strong> &mdash; small reusable pieces convert more reliably than giant monolithic frames.</li>
-        <li><strong>Define all states</strong> &mdash; create variants for hover, focused, disabled, and active states.</li>
-      </ul>
+    <div class="card">
+      <pre><code>kr-design-system/
+├── src/
+│   ├── index.ts                    &larr; Package entry (barrel export)
+│   ├── lib/utils.ts                &larr; cn() utility
+│   ├── styles/globals.css          &larr; Design tokens + Tailwind directives
+│   └── components/ui/
+│       ├── index.ts                &larr; Component barrel (auto-updated)
+│       ├── button.tsx              &larr; Generated component
+│       ├── button.stories.tsx      &larr; Generated story
+│       ├── confirm-dialog.tsx      &larr; Generated component
+│       └── confirm-dialog.stories.tsx
+├── .storybook/                     &larr; Storybook config
+├── .mcp.json                       &larr; Figma MCP connection
+├── tailwind.config.ts              &larr; Design tokens
+├── tsup.config.ts                  &larr; Build config
+├── package.json                    &larr; @kaufman-rossin/kr-design-system
+└── .claude/plugins/figma-tailwind/ &larr; The conversion skill</code></pre>
     </div>
-
-    <div class="card highlight">
-      <h3>When Requesting Conversion</h3>
-      <ul>
-        <li><strong>Share frame-level URLs</strong> &mdash; not the whole page. One frame = one component.</li>
-        <li><strong>Specify interactions</strong> &mdash; mention hover effects, click behavior, animations that aren't visible in the static design.</li>
-        <li><strong>Flag responsive needs</strong> &mdash; tell Claude if the layout should change at mobile/tablet breakpoints.</li>
-        <li><strong>Reference existing components</strong> &mdash; say "use the existing Button component" if you see one already in the codebase.</li>
-      </ul>
-    </div>
-
-    <!-- QA CHECKLIST -->
-    <h2>Quality Checklist</h2>
-
-    <p>After conversion, verify these items are met:</p>
-
-    <ul class="checklist">
-      <li>All colors use design tokens (no hardcoded hex values)</li>
-      <li>All classNames use the <code>cn()</code> utility</li>
-      <li>TypeScript interface defined for component props</li>
-      <li>Component uses <code>forwardRef</code> with <code>displayName</code></li>
-      <li><code>&lt;Icon&gt;</code> component used (no raw SVGs)</li>
-      <li>File is under 500 lines</li>
-      <li>Visual output matches the Figma screenshot</li>
-      <li>Responsive layout verified (mobile / tablet / desktop)</li>
-      <li>Hover, focus, and disabled states work correctly</li>
-      <li><code>npm run build</code> passes without errors</li>
-    </ul>
 
     <!-- TROUBLESHOOTING -->
     <h2>Troubleshooting</h2>
@@ -626,209 +986,54 @@
         <th>Solution</th>
       </tr>
       <tr>
-        <td>MCP tools not available</td>
-        <td>Ensure Figma Desktop is open with Dev Mode enabled. Check that the MCP plugin is running.</td>
+        <td>Figma MCP not authenticated</td>
+        <td>Tell Claude: <code>"Authenticate with Figma"</code> &mdash; it will open OAuth in your browser</td>
       </tr>
       <tr>
-        <td>Authentication expired</td>
-        <td>Ask Claude: <code>"Re-authenticate with Figma"</code></td>
+        <td>Colors don't match Figma exactly</td>
+        <td>Check if the Figma file uses named variables. Raw hex values may not map correctly. Compare against the token table above.</td>
       </tr>
       <tr>
-        <td>Generated code uses wrong colors</td>
-        <td>Ensure your Figma file uses the defined design variables, not raw hex values</td>
+        <td>Component not showing in Storybook</td>
+        <td>Ensure the <code>.stories.tsx</code> file exists and the component is exported from <code>src/components/ui/index.ts</code></td>
+      </tr>
+      <tr>
+        <td>Build fails after generation</td>
+        <td>Run <code>pnpm typecheck</code> to see specific TypeScript errors. Usually a missing import or type mismatch.</td>
       </tr>
       <tr>
         <td>Component too large (&gt;500 lines)</td>
-        <td>Share individual sections/frames instead of the entire page at once</td>
+        <td>Convert smaller frames individually. Tell Claude to split into sub-components.</td>
       </tr>
       <tr>
-        <td>Layout doesn't match</td>
-        <td>Ensure Figma uses Auto Layout (not absolute positioning). Tell Claude about any special responsive behavior.</td>
+        <td>Fonts look wrong</td>
+        <td>Ensure consumer apps load Inter + Roboto from Google Fonts (or the pre-built <code>styles.css</code> which includes the import).</td>
       </tr>
       <tr>
-        <td>Icons not rendering</td>
-        <td>Check that the icon name matches your project's icon system. Ask Claude to list available icons.</td>
+        <td>Can't install package in another app</td>
+        <td>Ensure the app's <code>.npmrc</code> has the <code>@kaufman-rossin</code> registry and a valid <code>GITHUB_TOKEN</code> with <code>read:packages</code> scope.</td>
       </tr>
     </table>
 
-    <!-- CONNECTING THE PLUGIN TO YOUR PROJECT -->
-    <h2>Connecting to Your Project</h2>
+    <!-- QUALITY CHECKLIST -->
+    <h2>Quality Checklist</h2>
 
-    <p>The <code>kr-design-system</code> plugin can be loaded from a local directory or a GitHub repository.
-      Add two settings to the project's Claude Code configuration. No files to copy &mdash; Claude Code loads the plugin automatically.</p>
+    <p>After generation, verify:</p>
 
-    <h3>Installation (One-Time per Project)</h3>
-
-    <div class="step-grid">
-      <div class="step">
-        <div class="step-num">1</div>
-        <h4>Open Your Project's Settings</h4>
-        <p>In your project root, open (or create) the file <code>.claude/settings.local.json</code></p>
-      </div>
-      <div class="step">
-        <div class="step-num">2</div>
-        <h4>Add the Marketplace + Plugin</h4>
-        <p>Choose one of the two options below. <strong>Option A</strong> is recommended for local development.</p>
-      </div>
-    </div>
-
-    <h3>Option A: Local Directory (Recommended)</h3>
-
-    <p>Point to the cloned <code>kr-design-system</code> repository on your machine:</p>
-
-    <pre><code>{
-  "extraKnownMarketplaces": {
-    "local-figma-tailwind": {
-      "source": {
-        "source": "directory",
-        "path": "/absolute/path/to/kr-design-system/.claude/plugins/figma-tailwind"
-      }
-    }
-  },
-  "enabledPlugins": {
-    "figma-tailwind@local-figma-tailwind": true
-  }
-}</code></pre>
-
-    <div class="card highlight">
-      <p><strong>How it works:</strong></p>
-      <ul>
-        <li><code>extraKnownMarketplaces</code> &mdash; registers a named marketplace that Claude Code will search for plugins</li>
-        <li><code>"source": "directory"</code> &mdash; tells Claude Code to load plugins from a local path (no network needed)</li>
-        <li><code>"path"</code> &mdash; the <strong>absolute path</strong> to the plugin folder (the one containing <code>.claude-plugin/plugin.json</code>)</li>
-        <li><code>"figma-tailwind@local-figma-tailwind"</code> &mdash; the plugin name (<code>figma-tailwind</code>) <code>@</code> your marketplace name</li>
-      </ul>
-    </div>
-
-    <div class="card warning">
-      <p><strong>Important:</strong> The <code>path</code> must be an absolute path ending in <code>/.claude/plugins/figma-tailwind</code>.
-        Replace <code>/absolute/path/to/kr-design-system</code> with the actual location where you cloned this repo.</p>
-    </div>
-
-    <h3>Option B: GitHub (Remote Distribution)</h3>
-
-    <p>Once the repository is published to GitHub:</p>
-
-    <pre><code>{
-  "extraKnownMarketplaces": {
-    "kr-design-system": {
-      "source": "github",
-      "repo": "kaufman2699/kr-design-system"
-    }
-  },
-  "enabledPlugins": {
-    "figma-tailwind@kr-design-system": true
-  }
-}</code></pre>
-
-    <div class="card highlight">
-      <p><strong>How it works:</strong></p>
-      <ul>
-        <li><code>"source": "github"</code> &mdash; tells Claude Code to fetch the plugin from a GitHub repository</li>
-        <li><code>"repo"</code> &mdash; the GitHub <code>owner/repo</code> (must contain the <code>marketplace.json</code> at the expected path)</li>
-        <li><code>"kr-design-system"</code> &mdash; the marketplace name (must match the <code>name</code> field in <code>marketplace.json</code>)</li>
-        <li><code>"figma-tailwind@kr-design-system"</code> &mdash; the plugin name <code>@</code> marketplace name</li>
-      </ul>
-    </div>
-
-    <div class="card warning">
-      <p><strong>Private repo?</strong> If the <code>kr-design-system</code> repository is private, ensure your Git credentials (SSH key or token) have read access. Claude Code uses your local Git configuration to clone the repo.</p>
-    </div>
-
-    <h3>Verify the Installation</h3>
-
-    <div class="step-grid">
-      <div class="step">
-        <div class="step-num">3</div>
-        <h4>Restart Claude Code</h4>
-        <p>Start a new Claude Code session in the project. The <code>figma-to-tailwind</code> skill appears in the available skills list automatically.</p>
-      </div>
-      <div class="step">
-        <div class="step-num">4</div>
-        <h4>Verify</h4>
-        <p>Ask Claude: <code>"What skills do you have for Figma?"</code> &mdash; it should mention <code>figma-to-tailwind</code>.</p>
-      </div>
-    </div>
-
-    <h3>What the Skill Does</h3>
-
-    <div class="card highlight">
-      <p>Once installed, the <code>figma-to-tailwind</code> skill automatically:</p>
-      <ol>
-        <li>Discovers project tokens from <code>tailwind.config.js</code> and global CSS</li>
-        <li>Runs the MCP extraction pipeline (screenshot &rarr; tokens &rarr; code connect &rarr; design context)</li>
-        <li>Transforms generated code to match project conventions (TypeScript, <code>cn()</code>, variants, <code>forwardRef</code>)</li>
-        <li>Maps Figma variables to the correct Tailwind utility classes</li>
-      </ol>
-    </div>
-
-    <h3>Trigger Phrases</h3>
-
-    <p>The skill activates when you say any of these to Claude Code:</p>
-    <ul>
-      <li><code>"Convert this Figma design to React"</code></li>
-      <li><code>"Generate components from Figma"</code></li>
-      <li><code>"Extract Figma to Tailwind"</code></li>
-      <li><code>"Create React component from design"</code></li>
-      <li><code>"Implement this Figma page"</code></li>
-      <li>Or simply paste a Figma URL and ask for code</li>
+    <ul class="checklist">
+      <li>Component uses design tokens (no hardcoded hex &mdash; use <code>firm-navy</code>, not <code>#1E4C7E</code>)</li>
+      <li>Uses <code>font-heading</code> for titles and <code>font-sans</code> for UI text</li>
+      <li>Buttons use <code>rounded-firm-sm</code>, cards use <code>rounded-firm</code></li>
+      <li>All classNames wrapped with <code>cn()</code> utility</li>
+      <li>TypeScript interface defined, component uses <code>forwardRef</code></li>
+      <li>Storybook story has <code>tags: ["autodocs"]</code> and Figma URL in parameters</li>
+      <li>Export added to <code>src/components/ui/index.ts</code></li>
+      <li><code>pnpm build</code> passes without errors</li>
+      <li>Visual output in Storybook matches Figma screenshot</li>
     </ul>
 
-    <h3>Plugin Repository Structure</h3>
-
-    <div class="card">
-      <pre><code>kr-design-system/                        ← Git repository
-├── README.md
-├── figma-to-code-guide.html             ← This guide
-└── .claude/plugins/figma-tailwind/      ← The plugin
-    ├── .claude-plugin/
-    │   ├── plugin.json                  ← Plugin manifest
-    │   └── marketplace.json             ← Marketplace manifest (name: "kr-design-system")
-    └── skills/figma-to-tailwind/
-        ├── SKILL.md                     ← Core workflow
-        ├── references/
-        │   ├── token-mapping.md         ← Color/spacing/typography → Tailwind
-        │   ├── component-patterns.md    ← forwardRef, cn(), variants
-        │   └── layout-mapping.md        ← Auto Layout → flex/grid
-        └── scripts/
-            └── audit-tokens.sh          ← Token gap analysis</code></pre>
-    </div>
-
-    <h3>Token Audit Script</h3>
-
-    <p>After installation, run the audit script to check for gaps between your CSS custom properties and Tailwind config:</p>
-
-    <pre><code># Using the local directory path:
-bash /path/to/kr-design-system/.claude/plugins/figma-tailwind/skills/figma-to-tailwind/scripts/audit-tokens.sh .
-
-# Or if you know where Claude Code cached the plugin:
-bash ~/.claude/plugins/cache/kr-design-system/*/skills/figma-to-tailwind/scripts/audit-tokens.sh .</code></pre>
-
-    <p>This reports any CSS variables not referenced in <code>tailwind.config.js</code> and lists all color extensions.</p>
-
-    <!-- QUICK REFERENCE -->
-    <h2>Quick Reference Commands</h2>
-
-    <div class="card">
-      <p>Paste these prompts into Claude Code to perform common tasks:</p>
-      <pre><code># Convert a full page
-"Convert this Figma page to React: https://figma.com/design/.../...?node-id=X-Y"
-
-# Convert a single component
-"Create a React component from this Figma element: [URL]"
-
-# Extract design tokens
-"Extract and sync design tokens from: [URL]"
-
-# Check what components already exist
-"What existing components match this Figma design? [URL]"
-
-# Visual comparison
-"Compare my implementation against the Figma design: [URL]"</code></pre>
-    </div>
-
     <footer>
-      <p>kr-design-system &middot; Kaufman Rossin DevTech &middot; Last updated: May 2026</p>
+      <p>@kaufman-rossin/kr-design-system &middot; Kaufman Rossin DevTech &middot; Last updated: June 2026</p>
     </footer>
 
   </div>

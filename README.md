@@ -1,140 +1,129 @@
-# kr-design-system
+# @kaufman-rossin/kr-design-system
 
-Kaufman Rossin design system plugin for Claude Code. Provides automated Figma-to-React component conversion using Tailwind CSS, design token mapping, and component patterns for the Firm brand.
+A shared React component library with Tailwind CSS, published as a private npm package for the Kaufman Rossin organization. Components are generated from Figma designs using Claude Code + Figma MCP and documented in Storybook.
 
-## What's Inside
+## Quick Start
+
+```bash
+# Prerequisites: Node.js 24+, pnpm
+corepack enable pnpm
+
+# Clone and install
+git clone https://github.com/kaufman2699/kr-design-system.git
+cd kr-design-system
+pnpm install
+
+# Launch Storybook (browse components)
+pnpm dev            # → http://localhost:6006
+
+# Build the package
+pnpm build          # → dist/ (ESM + CJS + types + CSS)
+```
+
+## Generating Components from Figma
+
+1. Open Claude Code in this project: `claude`
+2. Paste a Figma URL and ask: *"Convert this to a React component"*
+3. Claude generates the component + Storybook story + registers the export
+4. Run `pnpm dev` to preview in Storybook
+
+> **Full visual guide:** Open [`figma-to-code-guide.html`](./figma-to-code-guide.html) in your browser for step-by-step instructions with screenshots — covers setup, generating components, previewing in Storybook, publishing the package, and consuming it in other apps.
+
+## Using This Package in Your App
+
+### 1. Configure registry (one-time)
+
+Add to your app's `.npmrc`:
+
+```
+@kaufman-rossin:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}
+```
+
+### 2. Install
+
+```bash
+pnpm add @kaufman-rossin/kr-design-system
+```
+
+### 3. Import
+
+```tsx
+// Import pre-built styles (once, in app entry)
+import "@kaufman-rossin/kr-design-system/styles.css";
+
+// Import components
+import { Button, ConfirmDialog, Chip } from "@kaufman-rossin/kr-design-system";
+```
+
+### Alternative: Extend Tailwind (tree-shakeable)
+
+```ts
+// tailwind.config.ts
+import krPreset from "@kaufman-rossin/kr-design-system/tailwind-config";
+
+export default {
+  presets: [krPreset],
+  content: [
+    "./src/**/*.{ts,tsx}",
+    "./node_modules/@kaufman-rossin/kr-design-system/dist/**/*.js",
+  ],
+};
+```
+
+## Project Structure
 
 ```
 kr-design-system/
-├── README.md
-├── figma-to-code-guide.html                ← Visual guide for designers
-└── .claude/plugins/figma-tailwind/         ← Claude Code plugin
-    ├── .claude-plugin/
-    │   ├── plugin.json                     ← Plugin manifest
-    │   └── marketplace.json                ← Marketplace manifest
-    └── skills/figma-to-tailwind/
-        ├── SKILL.md                        ← Core conversion workflow
-        ├── references/
-        │   ├── token-mapping.md            ← Figma variables → Tailwind classes
-        │   ├── component-patterns.md       ← React component conventions
-        │   └── layout-mapping.md           ← Auto Layout → Tailwind flex/grid
-        └── scripts/
-            └── audit-tokens.sh             ← Token gap analysis
+├── src/
+│   ├── index.ts                     ← Package entry (barrel export)
+│   ├── lib/utils.ts                 ← cn() utility (clsx + tailwind-merge)
+│   ├── styles/globals.css           ← Design tokens + Tailwind directives
+│   └── components/ui/               ← Generated components + stories
+├── .storybook/                      ← Storybook configuration
+├── .mcp.json                        ← Figma MCP connection (OAuth)
+├── tailwind.config.ts               ← Shared Tailwind config with brand tokens
+├── tsup.config.ts                   ← Library build (ESM + CJS + DTS)
+├── postcss.config.cjs               ← PostCSS (Tailwind + Autoprefixer)
+├── package.json                     ← @kaufman-rossin/kr-design-system
+└── .claude/plugins/figma-tailwind/  ← Claude Code skill for Figma conversion
 ```
 
-## Installation
+## Commands
 
-Add to any project's `.claude/settings.local.json` (or `.claude/settings.json` if you want it checked into the repo).
+| Command | Description |
+|---------|-------------|
+| `pnpm dev` | Launch Storybook at localhost:6006 |
+| `pnpm build` | Build package (ESM + CJS + types + CSS) |
+| `pnpm typecheck` | Run TypeScript type checking |
+| `pnpm build:storybook` | Build static Storybook for deployment |
+| `pnpm publish` | Publish to GitHub Packages (builds first) |
 
-### Option A: Local directory (recommended for development)
+## Design Tokens
 
-Point directly to the cloned repo on your machine:
+| Token | Hex | Tailwind Class | Usage |
+|-------|-----|----------------|-------|
+| Navy | `#1E4C7E` | `firm-navy` | Primary buttons, headings |
+| Lime | `#AED136` | `firm-lime` | Accent buttons, focus rings |
+| Destructive | `#FF6158` | `firm-destructive` | Delete/danger actions |
+| Foreground | `#4B5563` | `firm-foreground` | Body text |
+| Muted | `#F2F2F2` | `firm-muted` | Secondary backgrounds |
+| Border | `#E5E7EB` | `firm-border` | Card borders, dividers |
 
-```json
-{
-  "extraKnownMarketplaces": {
-    "local-figma-tailwind": {
-      "source": {
-        "source": "directory",
-        "path": "/absolute/path/to/kr-design-system/.claude/plugins/figma-tailwind"
-      }
-    }
-  },
-  "enabledPlugins": {
-    "figma-tailwind@local-figma-tailwind": true
-  }
-}
-```
+**Typography:** Roboto (headings) + Inter (UI/body)
+**Radius:** 8px for containers (`rounded-firm`), 4px for buttons (`rounded-firm-sm`)
 
-> **Replace** the `path` value with the absolute path to where you cloned this repository, ending in `/.claude/plugins/figma-tailwind`.
+## Tech Stack
 
-### Option B: GitHub (for remote distribution)
-
-Once the repository is published to GitHub:
-
-```json
-{
-  "extraKnownMarketplaces": {
-    "kr-design-system": {
-      "source": "github",
-      "repo": "kaufman2699/kr-design-system"
-    }
-  },
-  "enabledPlugins": {
-    "figma-tailwind@kr-design-system": true
-  }
-}
-```
-
-> **Replace** `kaufman2699/kr-design-system` with the actual GitHub `owner/repo` where this repository is hosted.
-
----
-
-Start a new Claude Code session — the plugin is loaded and the `figma-to-tailwind` skill becomes available automatically.
-
-### How the naming connects
-
-| Setting | Value | Matches |
-|---|---|---|
-| `extraKnownMarketplaces` key | your marketplace name (e.g. `local-figma-tailwind` or `kr-design-system`) | used as the `@marketplace` suffix |
-| `source.path` (Option A) | absolute path to the plugin directory | must end at the folder containing `.claude-plugin/plugin.json` |
-| `source.repo` (Option B) | GitHub `owner/repo` | `marketplace.json` → `"name": "kr-design-system"` |
-| `enabledPlugins` key | `figma-tailwind@<marketplace-name>` | `plugin.json` → `"name": "figma-tailwind"` @ marketplace name |
-
-## What It Does
-
-When you share a Figma URL and ask for React code, the `figma-to-tailwind` skill:
-
-1. Extracts design tokens via Figma MCP tools
-2. Maps Figma variables to your project's Tailwind config
-3. Generates React + Tailwind components
-4. Applies project conventions: TypeScript, `cn()`, `forwardRef`, variant objects
-
-## Trigger Phrases
-
-The skill activates when you say:
-
-- "Convert this Figma design to React"
-- "Generate components from Figma"
-- "Extract Figma to Tailwind"
-- "Create React component from design"
-- "Implement this Figma page"
-- Or paste a Figma URL and ask for code
-
-## Prerequisites
-
-- [Claude Code](https://claude.ai/code) CLI
-- Figma MCP plugin authenticated (OAuth)
-- Target project with Tailwind CSS configured
-
-## Token Audit
-
-Run the included script to check for gaps between CSS custom properties and Tailwind config:
-
-```bash
-# From the kr-design-system repo root:
-bash .claude/plugins/figma-tailwind/skills/figma-to-tailwind/scripts/audit-tokens.sh /path/to/project
-
-# Or from any directory using the absolute path:
-bash /path/to/kr-design-system/.claude/plugins/figma-tailwind/skills/figma-to-tailwind/scripts/audit-tokens.sh /path/to/project
-```
-
-## Designer Guide
-
-Open `figma-to-code-guide.html` in a browser for a visual walkthrough covering setup, workflow, design tokens, layout mapping, and troubleshooting.
-
-## Design Tokens (Firm Brand Defaults)
-
-| Token | Hex | Tailwind Class |
-|---|---|---|
-| Navy | `#1D4C7E` | `firm-navy` |
-| Navy Light | `#2A6299` | `firm-navy-light` |
-| Navy Dark | `#153A61` | `firm-navy-dark` |
-| Lime | `#AED136` | `firm-lime` |
-| Lime Light | `#B5DD5A` | `firm-lime-light` |
-| Lime Dark | `#7FB01E` | `firm-lime-dark` |
-
-These are defaults — the skill reads each project's `tailwind.config.js` at runtime and adapts to whatever tokens are defined there.
+| Tool | Version | Purpose |
+|------|---------|---------|
+| React | 19.x | Component framework |
+| TypeScript | 6.x | Type safety |
+| Tailwind CSS | 3.4 | Utility-first styling |
+| Storybook | 10.x | Component documentation |
+| tsup | 8.x | Library bundling (ESM + CJS + DTS) |
+| pnpm | 11.x | Package manager |
+| Node.js | 24+ | Runtime |
 
 ## License
 

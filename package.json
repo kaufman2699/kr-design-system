@@ -1,0 +1,77 @@
+{
+  "name": "@kaufman-rossin/kr-design-system",
+  "version": "0.1.0",
+  "description": "Kaufman Rossin React component library with Tailwind CSS design tokens",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./styles.css": "./dist/styles.css",
+    "./tailwind-config": {
+      "import": "./dist/tailwind-config.js",
+      "require": "./dist/tailwind-config.cjs"
+    }
+  },
+  "files": [
+    "dist",
+    "tailwind.config.ts"
+  ],
+  "sideEffects": [
+    "./dist/styles.css"
+  ],
+  "scripts": {
+    "dev": "storybook dev -p 6006",
+    "build": "tsup && pnpm build:css",
+    "build:css": "postcss src/styles/globals.css -o dist/styles.css",
+    "build:storybook": "storybook build",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "pnpm build"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0"
+  },
+  "dependencies": {
+    "clsx": "^2.1.0",
+    "tailwind-merge": "^2.5.0"
+  },
+  "devDependencies": {
+    "@storybook/react": "^10.4.2",
+    "@storybook/react-vite": "^10.4.2",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "autoprefixer": "^10.4.0",
+    "postcss": "^8.4.0",
+    "postcss-cli": "^11.0.0",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "storybook": "^10.4.2",
+    "tailwindcss": "^3.4.0",
+    "tsup": "^8.0.0",
+    "typescript": "^6.0.3"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
+    "access": "restricted"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kaufman2699/kr-design-system.git"
+  },
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "license": "UNLICENSED",
+  "packageManager": "pnpm@11.5.2+sha512.71c631e382066efc25625d5cf029075de07b61b37f6e27350fbd84b1bda5864c8c1967adc280776b45c30a715c0359a3be08fef42d5bb09e2b99029979692916"
+}

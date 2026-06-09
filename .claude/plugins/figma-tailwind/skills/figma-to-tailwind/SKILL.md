@@ -96,12 +96,137 @@ Determine where to place each new component:
 | Feature-specific | `src/features/<name>/` |
 | Full page | `src/features/<name>/<name>-page.tsx` |
 
+### Phase 4B: Story Generation
+
+After placing the component file, generate a co-located Storybook story (`.stories.tsx`).
+
+**4B.1 Detect story shape from the generated component:**
+- Has `variantClasses` → generate one named story per variant key + an `AllVariants` render story
+- Has `sizeClasses` → generate one story per size key
+- Has complex props (callbacks, data objects) → generate state-based stories (loading, error, success)
+- Is a compound component (Card + CardHeader + CardContent) → generate composed usage stories
+
+**4B.2 Extract metadata:**
+- Component name and export type (named or default)
+- All variant/size keys from `as const` objects
+- Props interface (required vs optional props → args vs render stories)
+- Figma node URL from Phase 1 (use as `parameters.design.url`)
+
+**4B.3 Build argTypes with Storybook Controls:**
+
+For every prop in the component's interface, define an `argTypes` entry with:
+- `control` — the appropriate control type
+- `description` — what the prop does (one sentence)
+- `table.category` — group into: Content, Appearance, State, or Events
+- `table.defaultValue` — show the default value (if optional prop has one)
+
+**Control type selection rules:**
+
+| Prop type | Control | Example |
+|---|---|---|
+| String union (variant/size) | `control: "select"` + `options: [...]` | `variant`, `size` |
+| `boolean` | `control: "boolean"` | `disabled`, `checked`, `selected` |
+| `string` (label/text) | `control: "text"` | `title`, `children`, `label` |
+| `ReactNode` (icon/slot) | `control: false` | `icon`, `prefix` |
+| `number` | `control: { type: "number", min, max, step }` | `count`, `maxWidth` |
+| Callback `() => void` | `action: "eventName"` | `onClick`, `onConfirm` |
+
+**Category assignment rules:**
+
+| Category | Props that belong here |
+|---|---|
+| Content | `children`, `title`, `description`, `label`, `icon`, text/content props |
+| Appearance | `variant`, `size`, `color`, visual style props |
+| State | `disabled`, `checked`, `selected`, `loading`, `open`, state props |
+| Events | `onClick`, `onChange`, `onConfirm`, `onCancel`, callback props |
+
+**4B.4 Apply story template:**
+```typescript
+import type { Meta, StoryObj } from "@storybook/react";
+import { ComponentName } from "./component-name";
+
+const meta = {
+  title: "<Title>",              // "UI/X", "Components/X", or "Features/Y/X"
+  component: ComponentName,
+  tags: ["autodocs"],
+  args: {
+    children: "Default label",   // sensible defaults for interactive controls
+  },
+  argTypes: {
+    variant: {
+      control: "select",
+      options: ["default", "accent", "destructive"],
+      description: "Visual style of the component",
+      table: {
+        category: "Appearance",
+        defaultValue: { summary: "default" },
+      },
+    },
+    disabled: {
+      control: "boolean",
+      description: "Disables interaction and reduces opacity",
+      table: {
+        category: "State",
+        defaultValue: { summary: "false" },
+      },
+    },
+    onClick: {
+      action: "clicked",
+      description: "Click handler",
+      table: { category: "Events" },
+    },
+    // ... add all props from the interface
+  },
+  parameters: {
+    design: { type: "figma", url: "FIGMA_NODE_URL_FROM_PHASE_1" },
+  },
+} satisfies Meta<typeof ComponentName>;
+
+export default meta;
+type Story = StoryObj<typeof meta>;
+```
+
+**4B.5 Title derivation from file path:**
+| Component Location | Story Title |
+|---|---|
+| `src/components/ui/X.tsx` | `UI/X` |
+| `src/components/X.tsx` | `Components/X` |
+| `src/features/Y/X.tsx` | `Features/Y/X` |
+
+**4B.6 Required stories:**
+- One story per variant (named exports: `Default`, `Accent`, `Destructive`, etc.)
+- An `AllVariants` story that renders all variants side by side
+- Interaction states for interactive components (disabled, focused)
+
+See `references/story-template.md` for complete templates.
+
+### Phase 4C: Barrel Export Registration
+
+After placing the component and its story, register it in the package barrel exports so consumers can import it.
+
+**4C.1 Update component barrel (`src/components/ui/index.ts`):**
+```typescript
+export { ComponentName, type ComponentNameProps } from "./component-name";
+```
+
+**4C.2 Verification:**
+- Confirm the component is re-exported through `src/index.ts` (it uses `export * from "./components/ui"`)
+- Run `pnpm typecheck` to confirm no circular or missing imports
+
+**4C.3 Rules:**
+- Always export both the component and its Props type interface
+- Use named exports, never default exports
+- Keep barrel file alphabetically sorted by component name
+- If the component lives outside `src/components/ui/` (e.g., `src/components/` or `src/features/`), add a direct export line in `src/index.ts`
+
 ### Phase 5: Verification
 
-1. Run `npm run build` (or equivalent) to confirm no TypeScript errors
-2. Compare rendered output against Figma screenshot
-3. Check responsive behavior at mobile/tablet/desktop breakpoints
-4. Verify interaction states: hover, focus-visible, disabled, active
+1. Run `pnpm typecheck` to confirm no TypeScript errors
+2. Run `pnpm build` to confirm the component is included in dist output
+3. Verify the new component appears in Storybook (`pnpm dev`) — check it renders and controls work
+4. Compare rendered output against Figma screenshot
+5. Check responsive behavior at mobile/tablet/desktop breakpoints
+6. Verify interaction states: hover, focus-visible, disabled, active
 
 ## Component Template
 

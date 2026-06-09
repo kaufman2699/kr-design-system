@@ -151,22 +151,53 @@ For non-standard values, use arbitrary: `p-[18px]` or `gap-[22px]`.
 
 These are the default tokens for the Kaufman Rossin / Ruflo projects:
 
+### Font Families
+
+| Usage | Font | Tailwind Class |
+|---|---|---|
+| UI elements, buttons, body text | `Inter` | `font-sans` |
+| Headings, titles | `Roboto` | `font-heading` |
+
+When Figma shows `Roboto:Bold` → use `font-heading font-bold`.
+When Figma shows `Inter:Semi_Bold` → use `font-sans font-semibold`.
+
+### Colors
+
 | Name | Hex | Tailwind Class | CSS Variable |
 |---|---|---|---|
-| Navy | `#1D4C7E` | `firm-navy` | `--firm-navy` |
+| Navy | `#1E4C7E` | `firm-navy` | `--firm-navy` |
 | Navy Light | `#2A6299` | `firm-navy-light` | `--firm-navy-light` |
 | Navy Dark | `#153A61` | `firm-navy-dark` | `--firm-navy-dark` |
 | Lime | `#AED136` | `firm-lime` | `--firm-lime` |
 | Lime Light | `#B5DD5A` | `firm-lime-light` | `--firm-lime-light` |
 | Lime Dark | `#7FB01E` | `firm-lime-dark` | `--firm-lime-dark` |
-| Background | `#F9FAFB` | `bg-[var(--background)]` | `--background` |
+| Destructive | `#FF6158` | `firm-destructive` | `--firm-destructive` |
+| Destructive Dark | `#E5554D` | `firm-destructive-dark` | `--firm-destructive-dark` |
+| Background | `#F9FAFB` | `bg-firm-background` | `--background` |
 | Foreground | `#4B5563` | `text-firm-foreground` | `--foreground` |
-| Card | `#FFFFFF` | `bg-white` | `--card` |
-| Muted | `#E6E6E6` | `bg-[var(--muted)]` | `--muted` |
-| Muted Foreground | `#6B7280` | `text-[var(--muted-foreground)]` | `--muted-foreground` |
-| Border | `#E5E7EB` | `border-[var(--border)]` | `--border` |
-| Input Border | `#C2D0DE` | `border-[var(--input-border)]` | `--input-border` |
+| Card | `#FFFFFF` | `bg-firm-card` | `--card` |
+| Muted | `#F2F2F2` | `bg-firm-muted` | `--muted` |
+| Muted Foreground | `#6B7280` | `text-firm-muted-foreground` | `--muted-foreground` |
+| Border | `#E5E7EB` | `border-firm-border` | `--border` |
+| Input Border | `#C4C4C4` | `border-[var(--input-border)]` | `--input-border` |
 | Ring | `#AED136` | `ring-firm-lime` | `--ring` |
-| Radius | `10px` | `rounded-[var(--radius)]` | `--radius` |
+
+### Border Radius
+
+| Usage | Value | Tailwind Class | CSS Variable |
+|---|---|---|---|
+| Cards, dialogs, containers | `8px` | `rounded-firm` | `--radius` |
+| Buttons, inputs, small elements | `4px` | `rounded-firm-sm` | `--radius-sm` |
+
+### Key Mappings from Figma
+
+| Figma Value | Correct Tailwind | NOT this |
+|---|---|---|
+| `#FF6158` (red button) | `bg-firm-destructive` | ~~`bg-red-500`~~ |
+| `#F2F2F2` (cancel bg) | `bg-firm-muted` | ~~`bg-white`~~ |
+| `#C4C4C4` (cancel border) | `border-[var(--input-border)]` | ~~`border-firm-border`~~ |
+| `#1E4C7E` (navy text) | `text-firm-navy` | ~~`text-[#1E4C7E]`~~ |
+| Button border-radius | `rounded-firm-sm` | ~~`rounded-firm`~~ |
+| Card border-radius | `rounded-firm` | ~~`rounded-lg`~~ |
 
 For other projects, discover tokens at runtime by reading `tailwind.config.js` and the global CSS file.

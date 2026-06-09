@@ -1,0 +1,36 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --font-sans: "Inter", system-ui, sans-serif;
+    --font-heading: "Roboto", "Inter", system-ui, sans-serif;
+
+    --firm-navy: #1E4C7E;
+    --firm-navy-light: #2A6299;
+    --firm-navy-dark: #153A61;
+    --firm-lime: #AED136;
+    --firm-lime-light: #B5DD5A;
+    --firm-lime-dark: #7FB01E;
+    --firm-destructive: #FF6158;
+    --firm-destructive-dark: #E5554D;
+
+    --background: #F9FAFB;
+    --foreground: #4B5563;
+    --card: #FFFFFF;
+    --muted: #F2F2F2;
+    --muted-foreground: #6B7280;
+    --border: #E5E7EB;
+    --input-border: #C4C4C4;
+    --ring: #AED136;
+    --radius: 8px;
+    --radius-sm: 4px;
+  }
+
+  body {
+    font-family: var(--font-sans);
+  }
+}

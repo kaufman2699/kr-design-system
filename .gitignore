@@ -1,0 +1,30 @@
+# Logs
+logs/
+\*.log
+*.log
+
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+*.tsbuildinfo
+
+# Environment — ignore all, keep example
+.npmrc
+.env
+.env.*
+!.env.example
+*.local
+
+# Tooling
+.playwright-mcp/
+.remember/
+
+# Editor directories and OS
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+Thumbs.db
+.tool-versions
