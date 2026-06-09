@@ -62,8 +62,7 @@
     "typescript": "^6.0.3"
   },
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com",
-    "access": "restricted"
+    "@kaufman2699:registry": "https://npm.pkg.github.com"
   },
   "repository": {
     "type": "git",
