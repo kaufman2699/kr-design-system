@@ -38,7 +38,7 @@
     "test:coverage": "vitest run --coverage",
     "generate:catalog": "tsx scripts/generate-catalog.ts && tsx scripts/generate-tokens.ts",
     "prepublishOnly": "pnpm typecheck && pnpm test && pnpm generate:catalog && pnpm build",
-    "prepare": "node node_modules/simple-git-hooks/cli.js || true"
+    "prepare": "[ \"$CI\" = 'true' ] || simple-git-hooks"
   },
   "peerDependencies": {
     "react": ">=18.0.0",
