@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
+import { within, userEvent, expect } from "storybook/test";
 import { Toggle } from "./toggle";
 
 const meta = {
@@ -65,6 +66,15 @@ export const DisabledOn: Story = {
 
 export const Interactive: Story = {
   args: { defaultChecked: false },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const toggle = canvas.getByRole("switch");
+    await expect(toggle).toHaveAttribute("aria-checked", "false");
+    await userEvent.click(toggle);
+    await expect(toggle).toHaveAttribute("aria-checked", "true");
+    await userEvent.click(toggle);
+    await expect(toggle).toHaveAttribute("aria-checked", "false");
+  },
 };
 
 export const WithLabel: Story = {

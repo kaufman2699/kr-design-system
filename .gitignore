@@ -8,10 +8,11 @@ node_modules/
 
 # Build output
 dist/
+coverage/
+storybook-static/
 *.tsbuildinfo
 
-# Environment — ignore all, keep example
-.npmrc
+# Environment
 .env
 .env.*
 !.env.example

@@ -177,6 +177,67 @@ export const Success: Story = { args: { status: "success", data: mockData } };
 export const Error: Story = { args: { status: "error", error: "Something went wrong" } };
 ```
 
+## Template: Component Test File
+
+Every component gets a co-located `.test.tsx` file with unit tests:
+
+```typescript
+import { test, expect, vi } from "vitest";
+import { render, screen } from "@testing-library/react";
+import { userEvent } from "@testing-library/user-event";
+import { ComponentName } from "./component-name";
+
+// Rendering
+test("renders with text content", () => {
+  render(<ComponentName>Label</ComponentName>);
+  expect(screen.getByRole("button", { name: "Label" })).toBeInTheDocument();
+});
+
+// Variants
+test("default variant applies correct classes", () => {
+  render(<ComponentName variant="default">X</ComponentName>);
+  expect(screen.getByRole("button").className).toContain("bg-firm-navy");
+});
+
+// Disabled state
+test("disabled has disabled attribute", () => {
+  render(<ComponentName disabled>X</ComponentName>);
+  expect(screen.getByRole("button")).toBeDisabled();
+});
+
+// Interactions
+test("click handler fires", async () => {
+  const onClick = vi.fn();
+  render(<ComponentName onClick={onClick}>X</ComponentName>);
+  await userEvent.click(screen.getByRole("button"));
+  expect(onClick).toHaveBeenCalledOnce();
+});
+
+test("click does not fire when disabled", async () => {
+  const onClick = vi.fn();
+  render(<ComponentName disabled onClick={onClick}>X</ComponentName>);
+  await userEvent.click(screen.getByRole("button"));
+  expect(onClick).not.toHaveBeenCalled();
+});
+
+// Ref forwarding
+test("forwards ref", () => {
+  const ref = { current: null } as React.RefObject<HTMLButtonElement | null>;
+  render(<ComponentName ref={ref}>X</ComponentName>);
+  expect(ref.current).toBeInstanceOf(HTMLButtonElement);
+});
+
+// className merging
+test("merges custom className", () => {
+  render(<ComponentName className="custom">X</ComponentName>);
+  expect(screen.getByRole("button").className).toContain("custom");
+});
+```
+
+**Test naming convention:** `"{behavior description}"` — not `"should render"` or `"it does X"`.
+
+**Run with:** `pnpm test` (all tests) or `pnpm test:coverage` (with coverage report).
+
 ## Rules
 
 1. **Always use `satisfies Meta<typeof X>`** — provides full type safety without type assertion
@@ -189,3 +250,4 @@ export const Error: Story = { args: { status: "error", error: "Something went wr
 8. **Wrap in a size-constrained decorator** — prevents full-width stretching for components with responsive behavior
 9. **Use the project's Icon component** — not inline SVGs, matching the same rule from component-patterns.md
 10. **Include interaction states** — `Disabled`, `Focused`, or `Loading` stories for interactive components
+11. **Always generate a `.test.tsx` file** — co-located with the component, covering rendering, variants, interactions, and accessibility

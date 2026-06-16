@@ -674,30 +674,30 @@ export const Destructive: StoryObj = {
     <!-- PUBLISHING -->
     <h2>Publishing the Package to npm</h2>
 
-    <p>After generating and reviewing components in Storybook, publish the package so other apps in the organization can use it.</p>
+    <p>After generating and reviewing components in Storybook, publish the package to npm so anyone can install it.</p>
 
     <h3>First-Time Setup (One per Machine)</h3>
 
     <div class="step-grid">
       <div class="step">
         <div class="step-num">1</div>
-        <h4>Create a GitHub Personal Access Token</h4>
-        <p>Go to <strong>GitHub &rarr; Settings &rarr; Developer settings &rarr; Personal access tokens &rarr; Tokens (classic)</strong>. Create a token with <code>write:packages</code> and <code>read:packages</code> scopes.</p>
+        <h4>Create an npm Account</h4>
+        <p>Sign up at <strong>https://www.npmjs.com/signup</strong> (free). Then create the <code>@kaufman2699</code> organization at <strong>https://www.npmjs.com/org/create</strong>.</p>
       </div>
       <div class="step">
         <div class="step-num">2</div>
-        <h4>Authenticate with GitHub Packages</h4>
-        <p>Run this command and paste your token when prompted for the password:</p>
+        <h4>Log In from Terminal</h4>
+        <p>Run this command and follow the prompts:</p>
       </div>
     </div>
 
     <div class="card">
-      <pre><code># Log in to GitHub Packages npm registry
-npm login --registry=https://npm.pkg.github.com
+      <pre><code># Log in to npm
+npm login
 
-# Username: your GitHub username
-# Password: paste your Personal Access Token
-# Email: your email</code></pre>
+# Follow the browser prompt to authenticate
+# Verify you're logged in:
+npm whoami</code></pre>
     </div>
 
     <h3>Publishing a New Version</h3>
@@ -736,11 +736,12 @@ pnpm publish</code></pre>
     <div class="card info">
       <p><strong>What happens when you run <code>pnpm publish</code>:</strong></p>
       <ol>
-        <li>Runs <code>pnpm build</code> automatically (via <code>prepublishOnly</code> script)</li>
-        <li>Packages the <code>dist/</code> folder and <code>tailwind.config.ts</code></li>
-        <li>Uploads to GitHub Packages at <code>https://npm.pkg.github.com</code></li>
-        <li>Only accessible by members of the <code>@kaufman-rossin</code> GitHub organization</li>
+        <li>Runs <code>pnpm typecheck</code> &mdash; blocks if types are broken</li>
+        <li>Runs <code>pnpm test</code> &mdash; blocks if any test fails</li>
+        <li>Runs <code>pnpm build</code> &mdash; produces dist/ (ESM + CJS + types + CSS)</li>
+        <li>Uploads to <strong>npmjs.com</strong> as a public package</li>
       </ol>
+      <p style="margin-top: 0.5rem;"><strong>Consumers install with:</strong> <code>pnpm add @kaufman2699/kr-design-system</code> &mdash; no .npmrc or tokens needed.</p>
     </div>
 
     <h3>Version Guidelines</h3>
@@ -784,20 +785,17 @@ pnpm publish</code></pre>
     <h3>1. Install the Package</h3>
 
     <div class="card">
-      <p>Add to your app's <code>.npmrc</code> (one-time):</p>
-      <pre><code>@kaufman-rossin:registry=https://npm.pkg.github.com
-//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}</code></pre>
-      <p>Then install:</p>
-      <pre><code>pnpm add @kaufman-rossin/kr-design-system</code></pre>
+      <p>No registry config needed &mdash; just install directly:</p>
+      <pre><code>pnpm add @kaufman2699/kr-design-system</code></pre>
     </div>
 
     <h3>2. Import Components</h3>
 
     <pre><code>// Import the pre-built styles (once, in your app entry)
-import "@kaufman-rossin/kr-design-system/styles.css";
+import "@kaufman2699/kr-design-system/styles.css";
 
 // Import components
-import { Button, ConfirmDialog } from "@kaufman-rossin/kr-design-system";</code></pre>
+import { Button, Chip, Toggle, ConfirmDialog } from "@kaufman2699/kr-design-system";</code></pre>
 
     <!-- DESIGN TOKEN REFERENCE -->
     <h2>Design Token Reference</h2>
@@ -1011,7 +1009,7 @@ import { Button, ConfirmDialog } from "@kaufman-rossin/kr-design-system";</code>
       </tr>
       <tr>
         <td>Can't install package in another app</td>
-        <td>Ensure the app's <code>.npmrc</code> has the <code>@kaufman-rossin</code> registry and a valid <code>GITHUB_TOKEN</code> with <code>read:packages</code> scope.</td>
+        <td>Make sure the package is published: run <code>pnpm publish</code> from the design system repo. Then <code>pnpm add @kaufman2699/kr-design-system</code> in your app.</td>
       </tr>
     </table>
 
@@ -1028,6 +1026,7 @@ import { Button, ConfirmDialog } from "@kaufman-rossin/kr-design-system";</code>
       <li>TypeScript interface defined, component uses <code>forwardRef</code></li>
       <li>Storybook story has <code>tags: ["autodocs"]</code> and Figma URL in parameters</li>
       <li>Export added to <code>src/components/ui/index.ts</code></li>
+      <li><code>pnpm test</code> passes (all unit tests green)</li>
       <li><code>pnpm build</code> passes without errors</li>
       <li>Visual output in Storybook matches Figma screenshot</li>
     </ul>

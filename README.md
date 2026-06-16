@@ -1,6 +1,6 @@
-# @kaufman-rossin/kr-design-system
+# @kaufman2699/kr-design-system
 
-A shared React component library with Tailwind CSS, published as a private npm package for the Kaufman Rossin organization. Components are generated from Figma designs using Claude Code + Figma MCP and documented in Storybook.
+A shared React component library with Tailwind CSS, published as a public npm package. Components are generated from Figma designs using Claude Code + Figma MCP and documented in Storybook.
 
 ## Quick Start
 
@@ -31,42 +31,35 @@ pnpm build          # → dist/ (ESM + CJS + types + CSS)
 
 ## Using This Package in Your App
 
-### 1. Configure registry (one-time)
-
-Add to your app's `.npmrc`:
-
-```
-@kaufman-rossin:registry=https://npm.pkg.github.com
-//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}
-```
-
-### 2. Install
+### Install
 
 ```bash
-pnpm add @kaufman-rossin/kr-design-system
+pnpm add @kaufman2699/kr-design-system
 ```
 
-### 3. Import
+No registry configuration needed — it's a public npm package.
+
+### Import
 
 ```tsx
 // Import pre-built styles (once, in app entry)
-import "@kaufman-rossin/kr-design-system/styles.css";
+import "@kaufman2699/kr-design-system/styles.css";
 
 // Import components
-import { Button, ConfirmDialog, Chip } from "@kaufman-rossin/kr-design-system";
+import { Button, ConfirmDialog, Chip, Toggle } from "@kaufman2699/kr-design-system";
 ```
 
 ### Alternative: Extend Tailwind (tree-shakeable)
 
 ```ts
 // tailwind.config.ts
-import krPreset from "@kaufman-rossin/kr-design-system/tailwind-config";
+import krPreset from "@kaufman2699/kr-design-system/tailwind-config";
 
 export default {
   presets: [krPreset],
   content: [
     "./src/**/*.{ts,tsx}",
-    "./node_modules/@kaufman-rossin/kr-design-system/dist/**/*.js",
+    "./node_modules/@kaufman2699/kr-design-system/dist/**/*.js",
   ],
 };
 ```
@@ -85,7 +78,7 @@ kr-design-system/
 ├── tailwind.config.ts               ← Shared Tailwind config with brand tokens
 ├── tsup.config.ts                   ← Library build (ESM + CJS + DTS)
 ├── postcss.config.cjs               ← PostCSS (Tailwind + Autoprefixer)
-├── package.json                     ← @kaufman-rossin/kr-design-system
+├── package.json                     ← @kaufman2699/kr-design-system
 └── .claude/plugins/figma-tailwind/  ← Claude Code skill for Figma conversion
 ```
 
@@ -97,7 +90,9 @@ kr-design-system/
 | `pnpm build` | Build package (ESM + CJS + types + CSS) |
 | `pnpm typecheck` | Run TypeScript type checking |
 | `pnpm build:storybook` | Build static Storybook for deployment |
-| `pnpm publish` | Publish to GitHub Packages (builds first) |
+| `pnpm test` | Run unit tests (49 tests, Vitest) |
+| `pnpm test:coverage` | Run tests with coverage report |
+| `pnpm publish` | Publish to npm (runs typecheck + tests + build first) |
 
 ## Design Tokens
 
@@ -127,4 +122,4 @@ kr-design-system/
 
 ## License
 
-Internal — Kaufman Rossin / DevTech
+MIT

@@ -219,14 +219,60 @@ export { ComponentName, type ComponentNameProps } from "./component-name";
 - Keep barrel file alphabetically sorted by component name
 - If the component lives outside `src/components/ui/` (e.g., `src/components/` or `src/features/`), add a direct export line in `src/index.ts`
 
+### Phase 4D: Test Generation
+
+After registering the barrel export, generate a co-located test file (`component-name.test.tsx`).
+
+**4D.1 Test file structure:**
+```typescript
+import { test, expect, vi } from "vitest";
+import { render, screen } from "@testing-library/react";
+import { userEvent } from "@testing-library/user-event";
+import { ComponentName } from "./component-name";
+
+test("renders component", () => {
+  render(<ComponentName>Label</ComponentName>);
+  expect(screen.getByRole("button")).toBeInTheDocument();
+});
+```
+
+**4D.2 Required test cases for every component:**
+
+| Category | What to test |
+|----------|-------------|
+| Rendering | Renders without crashing, shows correct text/content |
+| Variants | Each variant applies correct CSS classes |
+| Sizes | Each size applies correct height/padding classes |
+| Disabled | Has `disabled` attribute, click handler doesn't fire |
+| Interactions | onClick/onChange fires with correct arguments |
+| Accessibility | Correct role, aria attributes (aria-checked for toggles, etc.) |
+| Ref forwarding | `ref.current` is the correct DOM element type |
+| className merging | Custom `className` prop appears in rendered output |
+
+**4D.3 Testing rules:**
+- Import components directly (not via composeStories) for unit tests
+- Use `screen.getByRole()` for queries — never query by class name or test-id
+- Use `userEvent` (not `fireEvent`) for interactions
+- One assertion per test (keep tests focused and readable)
+- Name tests descriptively: `"disabled button has disabled attribute"`
+- Don't test internal implementation — test behavior and output
+
+**4D.4 Run tests after writing:**
+```bash
+pnpm test
+```
+
+All tests must pass before moving to Phase 5.
+
 ### Phase 5: Verification
 
 1. Run `pnpm typecheck` to confirm no TypeScript errors
 2. Run `pnpm build` to confirm the component is included in dist output
-3. Verify the new component appears in Storybook (`pnpm dev`) — check it renders and controls work
-4. Compare rendered output against Figma screenshot
-5. Check responsive behavior at mobile/tablet/desktop breakpoints
-6. Verify interaction states: hover, focus-visible, disabled, active
+3. Run `pnpm test` to confirm all tests pass
+4. Verify the new component appears in Storybook (`pnpm dev`) — check it renders and controls work
+5. Compare rendered output against Figma screenshot
+6. Check responsive behavior at mobile/tablet/desktop breakpoints
+7. Verify interaction states: hover, focus-visible, disabled, active
 
 ## Component Template
 

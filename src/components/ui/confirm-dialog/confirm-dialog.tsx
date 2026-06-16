@@ -1,6 +1,6 @@
 import * as React from "react";
-import { cn } from "../../lib/utils";
-import { Button } from "./button";
+import { cn } from "../../../lib/utils";
+import { Button } from "../button";
 
 export interface ConfirmDialogProps
   extends React.HTMLAttributes<HTMLDivElement> {

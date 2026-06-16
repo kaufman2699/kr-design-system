@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
+import { within, userEvent, expect } from "storybook/test";
 import { Button } from "./button";
 
 const meta = {
@@ -50,6 +51,13 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: { children: "Button", variant: "default" },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const button = canvas.getByRole("button");
+    await expect(button).toBeInTheDocument();
+    await expect(button).toHaveTextContent("Button");
+    await userEvent.click(button);
+  },
 };
 
 export const Accent: Story = {
@@ -80,6 +88,11 @@ export const AllVariants: Story = {
       )}
     </div>
   ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const buttons = canvas.getAllByRole("button");
+    await expect(buttons).toHaveLength(5);
+  },
 };
 
 export const AllSizes: Story = {
