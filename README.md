@@ -64,6 +64,26 @@ export default {
 };
 ```
 
+## Using with Claude.ai (No CLI Required)
+
+If you don't use Claude Code CLI, you can connect the design system to **Claude.ai web chat** via the MCP server. This gives Claude knowledge of all available components, props, and design tokens when you build apps in the chat.
+
+### Setup
+
+1. Deploy the MCP server: `cd mcp-server && pnpm start:http`
+2. In Claude.ai → Settings → Integrations → Add MCP Server
+3. Enter the deployed URL (e.g., `https://your-server.com/mcp`)
+
+### What You Get
+
+Once connected, Claude in web chat can:
+- List all available components (`list_components`)
+- Show code examples for any component (`get_component_code`)
+- Provide Storybook links for previewing (`get_storybook_url`)
+- Return all design tokens as Tailwind classes (`get_design_tokens`)
+
+Just ask: *"Build me a settings page using the KR design system"* — Claude will use the correct components and tokens automatically.
+
 ## Project Structure
 
 ```

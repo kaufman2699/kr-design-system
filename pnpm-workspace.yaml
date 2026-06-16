@@ -1,6 +1,6 @@
 packages:
   - "."
-  - "demo"
+  - "mcp-server"
 
 allowBuilds:
   esbuild: true

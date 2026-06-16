@@ -33,9 +33,77 @@
       padding: 2rem 1rem;
     }
 
+    .page-layout {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 2rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 2rem;
+      align-self: start;
+      max-height: calc(100vh - 4rem);
+      overflow-y: auto;
+      padding-right: 1rem;
+      border-right: 1px solid var(--border);
+    }
+
+    .sidebar nav {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .sidebar a {
+      display: block;
+      padding: 0.4rem 0.75rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-decoration: none;
+      border-radius: var(--radius-sm);
+      line-height: 1.3;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .sidebar a:hover {
+      background: #EEF2F7;
+      color: var(--navy);
+    }
+
+    .sidebar a.active {
+      background: var(--navy);
+      color: white;
+    }
+
+    .sidebar .nav-group {
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--navy-dark);
+      padding: 0.75rem 0.75rem 0.25rem;
+      margin-top: 0.5rem;
+    }
+
+    .sidebar .nav-group:first-child {
+      margin-top: 0;
+    }
+
     .container {
       max-width: 860px;
       margin: 0 auto;
+    }
+
+    @media (max-width: 900px) {
+      .page-layout {
+        grid-template-columns: 1fr;
+      }
+      .sidebar {
+        display: none;
+      }
     }
 
     header {
@@ -296,7 +364,37 @@
   </style>
 </head>
 <body>
-  <div class="container">
+  <div class="page-layout">
+
+    <aside class="sidebar">
+      <nav>
+        <div class="nav-group">Getting Started</div>
+        <a href="#quick-start">Quick Start</a>
+        <a href="#how-it-works">How It Works</a>
+        <a href="#prerequisites">Prerequisites</a>
+
+        <div class="nav-group">Workflow</div>
+        <a href="#generating">Generating a Component</a>
+        <a href="#storybook-preview">Preview in Storybook</a>
+        <a href="#what-gets-generated">What Gets Generated</a>
+
+        <div class="nav-group">Publishing</div>
+        <a href="#updating-the-lib">Updating the Library</a>
+        <a href="#publishing">Publishing to npm</a>
+        <a href="#using-in-app">Using in Your App</a>
+        <a href="#mcp-web">Claude.ai Web (MCP)</a>
+
+        <div class="nav-group">Reference</div>
+        <a href="#design-tokens">Design Tokens</a>
+        <a href="#tips">Tips for Best Results</a>
+        <a href="#commands">Common Commands</a>
+        <a href="#project-structure">Project Structure</a>
+        <a href="#troubleshooting">Troubleshooting</a>
+        <a href="#quality-checklist">Quality Checklist</a>
+      </nav>
+    </aside>
+
+    <div class="container">
 
     <header>
       <h1>Figma &rarr; React Components <span class="badge">Tailwind + Storybook</span></h1>
@@ -304,7 +402,7 @@
     </header>
 
     <!-- TL;DR -->
-    <h2>Quick Start &mdash; 5 Steps to Generate a Component</h2>
+    <h2 id="quick-start">Quick Start &mdash; 5 Steps to Generate a Component</h2>
 
     <div class="card highlight">
       <ol>
@@ -317,7 +415,7 @@
     </div>
 
     <!-- HOW IT WORKS -->
-    <h2>How It Works</h2>
+    <h2 id="how-it-works">How It Works</h2>
 
     <div class="flow-diagram">
       <div class="flow-box">Figma URL</div>
@@ -367,7 +465,7 @@
     </table>
 
     <!-- PREREQUISITES -->
-    <h2>Prerequisites (One-Time Setup)</h2>
+    <h2 id="prerequisites">Prerequisites (One-Time Setup)</h2>
 
     <p>Follow these steps to set up your machine from scratch. If you already have some of these installed, skip to the next step.</p>
 
@@ -472,7 +570,7 @@ pnpm install</code></pre>
     </div>
 
     <!-- STEP BY STEP USAGE -->
-    <h2>Generating a Component: Step by Step</h2>
+    <h2 id="generating">Generating a Component: Step by Step</h2>
 
     <h3>Step 1: Get the Figma URL</h3>
 
@@ -535,7 +633,7 @@ https://www.figma.com/design/YOUR_FILE_KEY/FileName?node-id=123-456&m=dev</code>
       </div>
     </div>
 
-    <h3>Step 4: Preview in Storybook</h3>
+    <h3 id="storybook-preview">Step 4: Preview in Storybook</h3>
 
     <p>After generation, launch Storybook to browse and test your new component:</p>
 
@@ -592,9 +690,9 @@ https://www.figma.com/design/YOUR_FILE_KEY/FileName?node-id=123-456&m=dev</code>
     </div>
 
     <!-- WHAT YOU GET -->
-    <h2>What Gets Generated</h2>
+    <h2 id="what-gets-generated">What Gets Generated</h2>
 
-    <p>For each Figma frame, Claude creates <strong>3 things</strong>:</p>
+    <p>For each Figma frame, Claude creates <strong>4 files</strong> in a new folder:</p>
 
     <table>
       <tr>
@@ -605,16 +703,26 @@ https://www.figma.com/design/YOUR_FILE_KEY/FileName?node-id=123-456&m=dev</code>
       <tr>
         <td><code>component-name.tsx</code></td>
         <td>The React component with TypeScript types and Tailwind classes</td>
-        <td><code>src/components/ui/</code></td>
+        <td><code>src/components/ui/component-name/</code></td>
       </tr>
       <tr>
         <td><code>component-name.stories.tsx</code></td>
         <td>Storybook stories with variant controls and Figma design link</td>
-        <td><code>src/components/ui/</code></td>
+        <td><code>src/components/ui/component-name/</code></td>
+      </tr>
+      <tr>
+        <td><code>component-name.test.tsx</code></td>
+        <td>Unit tests (rendering, variants, interactions, accessibility)</td>
+        <td><code>src/components/ui/component-name/</code></td>
+      </tr>
+      <tr>
+        <td><code>index.ts</code></td>
+        <td>Folder barrel export</td>
+        <td><code>src/components/ui/component-name/</code></td>
       </tr>
       <tr>
         <td><code>index.ts</code> (updated)</td>
-        <td>Barrel export so the component is importable from the package</td>
+        <td>Root barrel export so the component is importable from the package</td>
         <td><code>src/components/ui/index.ts</code></td>
       </tr>
     </table>
@@ -671,8 +779,123 @@ export const Destructive: StoryObj = {
   args: { title: "Delete chat?", confirmLabel: "Delete", variant: "destructive" },
 };</code></pre>
 
+    <!-- UPDATING THE LIB -->
+    <h2 id="updating-the-lib">Updating the Library (Full Workflow)</h2>
+
+    <p>When you add new components or update existing ones, follow this complete workflow to keep everything in sync:</p>
+
+    <div class="step-grid">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h4>Create a Branch</h4>
+        <p>Always work on a feature branch, not directly on <code>main</code>.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h4>Generate or Update Components</h4>
+        <p>Use Claude Code to convert Figma designs or manually edit existing components in <code>src/components/ui/</code>.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h4>Regenerate the MCP Catalog</h4>
+        <p>Run <code>pnpm generate:catalog</code> to sync the MCP server with your component changes.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <h4>Run Tests</h4>
+        <p>Run <code>pnpm test</code> to ensure nothing is broken. Fix any failing tests.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <h4>Bump the Versions</h4>
+        <p>Update the version in both <code>package.json</code> (root) and <code>mcp-server/package.json</code> using semver.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">6</div>
+        <h4>Commit &amp; Open a Pull Request</h4>
+        <p>Push your branch and open a PR for review before merging to <code>main</code>.</p>
+      </div>
+    </div>
+
+    <h3>Commands (copy-paste)</h3>
+
+    <div class="card">
+      <pre><code># 1. Create a branch
+git checkout -b feat/add-new-component
+
+# 2. Generate component (via Claude Code)
+#    Paste Figma URL → Claude generates component + story + test + barrel export
+
+# 3. Regenerate MCP catalog
+pnpm generate:catalog
+
+# 4. Run tests + typecheck
+pnpm typecheck && pnpm test
+
+# 5. Bump versions (both packages)
+pnpm version minor    # or patch/major
+cd mcp-server && pnpm version minor && cd ..
+
+# 6. Commit and push
+git add .
+git commit -m "feat: add NewComponent from Figma"
+git push -u origin feat/add-new-component
+
+# 7. Open PR on GitHub
+#    Go to https://github.com/kaufman2699/kr-design-system/pulls
+#    or use: gh pr create --title "feat: add NewComponent"</code></pre>
+    </div>
+
+    <h3>Files That Change</h3>
+
+    <table>
+      <tr>
+        <th>File</th>
+        <th>What Changes</th>
+        <th>How</th>
+      </tr>
+      <tr>
+        <td><code>src/components/ui/new-component/</code></td>
+        <td>New component + story + test + index.ts</td>
+        <td>Generated by Claude Code</td>
+      </tr>
+      <tr>
+        <td><code>src/components/ui/index.ts</code></td>
+        <td>New export line added</td>
+        <td>Generated by Claude Code (Phase 4C)</td>
+      </tr>
+      <tr>
+        <td><code>mcp-server/catalog.ts</code></td>
+        <td>New component added to MCP catalog</td>
+        <td><code>pnpm generate:catalog</code> (auto-generated)</td>
+      </tr>
+      <tr>
+        <td><code>mcp-server/tokens.ts</code></td>
+        <td>Design tokens synced from tailwind.config.ts</td>
+        <td><code>pnpm generate:catalog</code> (auto-generated)</td>
+      </tr>
+      <tr>
+        <td><code>package.json</code></td>
+        <td>Version bumped</td>
+        <td><code>pnpm version minor</code></td>
+      </tr>
+      <tr>
+        <td><code>mcp-server/package.json</code></td>
+        <td>MCP server version bumped</td>
+        <td><code>cd mcp-server && pnpm version minor</code></td>
+      </tr>
+    </table>
+
+    <div class="card warning">
+      <p><strong>Don't skip <code>pnpm generate:catalog</code>!</strong> Without it, the MCP server won't know about new components, and Claude.ai web users won't be able to use them.</p>
+    </div>
+
+    <div class="card info">
+      <p><strong>After PR is merged:</strong> Run <code>pnpm publish</code> from <code>main</code> to push the new version to npm. Consumers update with <code>pnpm update @kaufman2699/kr-design-system</code>.</p>
+    </div>
+
     <!-- PUBLISHING -->
-    <h2>Publishing the Package to npm</h2>
+    <h2 id="publishing">Publishing the Package to npm</h2>
 
     <p>After generating and reviewing components in Storybook, publish the package to npm so anyone can install it.</p>
 
@@ -729,7 +952,7 @@ pnpm version patch    # 0.1.0 → 0.1.1 (bug fixes, small tweaks)
 pnpm version minor    # 0.1.0 → 0.2.0 (new components added)
 pnpm version major    # 0.1.0 → 1.0.0 (breaking changes)
 
-# 3. Publish to GitHub Packages
+# 3. Publish to npm
 pnpm publish</code></pre>
     </div>
 
@@ -738,6 +961,7 @@ pnpm publish</code></pre>
       <ol>
         <li>Runs <code>pnpm typecheck</code> &mdash; blocks if types are broken</li>
         <li>Runs <code>pnpm test</code> &mdash; blocks if any test fails</li>
+        <li>Runs <code>pnpm generate:catalog</code> &mdash; syncs MCP catalog + tokens</li>
         <li>Runs <code>pnpm build</code> &mdash; produces dist/ (ESM + CJS + types + CSS)</li>
         <li>Uploads to <strong>npmjs.com</strong> as a public package</li>
       </ol>
@@ -778,7 +1002,7 @@ pnpm publish</code></pre>
     </div>
 
     <!-- CONSUMING THE PACKAGE -->
-    <h2>Using Components in Your App</h2>
+    <h2 id="using-in-app">Using Components in Your App</h2>
 
     <p>After components are generated and the package is published, other apps in the org consume them via:</p>
 
@@ -797,8 +1021,74 @@ import "@kaufman2699/kr-design-system/styles.css";
 // Import components
 import { Button, Chip, Toggle, ConfirmDialog } from "@kaufman2699/kr-design-system";</code></pre>
 
+    <!-- MCP FOR CLAUDE WEB -->
+    <h2 id="mcp-web">Using with Claude.ai Web (No CLI Required)</h2>
+
+    <p>If you don't use Claude Code CLI, you can connect the design system to <strong>Claude.ai web chat</strong> via the MCP server. This gives Claude knowledge of all available components when you build apps in the chat.</p>
+
+    <div class="card info">
+      <p><strong>Who is this for?</strong> Users who want to build React apps with the design system components by chatting with Claude in the browser &mdash; no terminal, no CLI, no local setup needed.</p>
+    </div>
+
+    <h3>How to Connect</h3>
+
+    <div class="step-grid">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h4>Get the MCP Server URL</h4>
+        <p>Ask your team lead for the deployed MCP server URL (e.g., <code>https://kr-design-system-mcp.up.railway.app/mcp</code>).</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h4>Add to Claude.ai</h4>
+        <p>Go to <strong>Claude.ai &rarr; Settings &rarr; Integrations &rarr; Add MCP Server</strong>. Paste the URL.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h4>Start Building</h4>
+        <p>Ask Claude: <em>"Build me a settings page using the KR design system"</em> &mdash; Claude will use the correct components and tokens automatically.</p>
+      </div>
+    </div>
+
+    <h3>What Claude Knows (via MCP)</h3>
+
+    <table>
+      <tr>
+        <th>Tool</th>
+        <th>What It Provides</th>
+      </tr>
+      <tr>
+        <td><code>list_components</code></td>
+        <td>All available components with descriptions and Storybook links</td>
+      </tr>
+      <tr>
+        <td><code>get_component_code</code></td>
+        <td>Ready-to-use code example for any component (import + props + JSX)</td>
+      </tr>
+      <tr>
+        <td><code>get_storybook_url</code></td>
+        <td>Link to live Storybook docs for previewing a component</td>
+      </tr>
+      <tr>
+        <td><code>get_design_tokens</code></td>
+        <td>All brand colors, fonts, and radius values as Tailwind classes</td>
+      </tr>
+    </table>
+
+    <h3>Example Prompts for Claude.ai Web</h3>
+
+    <div class="card">
+      <ul>
+        <li><code>"What components are available in the KR design system?"</code></li>
+        <li><code>"Show me how to use the Button component with all variants"</code></li>
+        <li><code>"Build a form with a title, two inputs, and Cancel/Save buttons"</code></li>
+        <li><code>"Create a filter bar with Chips for All, Active, Completed"</code></li>
+        <li><code>"What design tokens (colors, fonts) should I use?"</code></li>
+      </ul>
+    </div>
+
     <!-- DESIGN TOKEN REFERENCE -->
-    <h2>Design Token Reference</h2>
+    <h2 id="design-tokens">Design Token Reference</h2>
 
     <p>The converter automatically maps Figma values to these tokens. Designers should use these colors as Figma variables for best results.</p>
 
@@ -898,7 +1188,7 @@ import { Button, Chip, Toggle, ConfirmDialog } from "@kaufman2699/kr-design-syst
     </table>
 
     <!-- TIPS -->
-    <h2>Tips for Best Results</h2>
+    <h2 id="tips">Tips for Best Results</h2>
 
     <div class="card highlight">
       <h3>For Designers (in Figma)</h3>
@@ -918,12 +1208,12 @@ import { Button, Chip, Toggle, ConfirmDialog } from "@kaufman2699/kr-design-syst
         <li><strong>Mention interactions</strong> &mdash; tell Claude about hover effects, animations, or conditional behavior.</li>
         <li><strong>Reference existing components</strong> &mdash; say "use the existing Button" if you see one already in the library.</li>
         <li><strong>Check Storybook after generation</strong> &mdash; run <code>pnpm dev</code> to visually verify.</li>
-        <li><strong>Publish after review</strong> &mdash; run <code>pnpm publish</code> to push to GitHub Packages when ready.</li>
+        <li><strong>Publish after review</strong> &mdash; run <code>pnpm publish</code> to push to npm when ready.</li>
       </ul>
     </div>
 
     <!-- COMMON COMMANDS -->
-    <h2>Common Commands</h2>
+    <h2 id="commands">Common Commands</h2>
 
     <table>
       <tr>
@@ -947,36 +1237,63 @@ import { Button, Chip, Toggle, ConfirmDialog } from "@kaufman2699/kr-design-syst
         <td>Builds static Storybook for deployment</td>
       </tr>
       <tr>
+        <td><code>pnpm generate:catalog</code></td>
+        <td>Auto-generates MCP catalog + tokens from source components and tailwind.config.ts</td>
+      </tr>
+      <tr>
+        <td><code>pnpm test</code></td>
+        <td>Runs unit tests (Vitest)</td>
+      </tr>
+      <tr>
+        <td><code>pnpm test:coverage</code></td>
+        <td>Runs tests with coverage report</td>
+      </tr>
+      <tr>
         <td><code>pnpm publish</code></td>
-        <td>Publishes to GitHub Packages (builds first automatically)</td>
+        <td>Publishes to npm (runs typecheck + tests + catalog + build first)</td>
       </tr>
     </table>
 
     <!-- PROJECT STRUCTURE -->
-    <h2>Project Structure</h2>
+    <h2 id="project-structure">Project Structure</h2>
 
     <div class="card">
       <pre><code>kr-design-system/
 ├── src/
-│   ├── index.ts                    &larr; Package entry (barrel export)
-│   ├── lib/utils.ts                &larr; cn() utility
-│   ├── styles/globals.css          &larr; Design tokens + Tailwind directives
+│   ├── index.ts                       &larr; Package entry (barrel export)
+│   ├── lib/utils.ts                   &larr; cn() utility (clsx + tailwind-merge)
+│   ├── styles/globals.css             &larr; CSS variables + Tailwind directives
 │   └── components/ui/
-│       ├── index.ts                &larr; Component barrel (auto-updated)
-│       ├── button.tsx              &larr; Generated component
-│       ├── button.stories.tsx      &larr; Generated story
-│       ├── confirm-dialog.tsx      &larr; Generated component
-│       └── confirm-dialog.stories.tsx
-├── .storybook/                     &larr; Storybook config
-├── .mcp.json                       &larr; Figma MCP connection
-├── tailwind.config.ts              &larr; Design tokens
-├── tsup.config.ts                  &larr; Build config
-├── package.json                    &larr; @kaufman-rossin/kr-design-system
-└── .claude/plugins/figma-tailwind/ &larr; The conversion skill</code></pre>
+│       ├── index.ts                   &larr; Component barrel (auto-updated)
+│       ├── button/
+│       │   ├── button.tsx             &larr; Component
+│       │   ├── button.stories.tsx     &larr; Storybook story
+│       │   ├── button.test.tsx        &larr; Unit tests
+│       │   └── index.ts              &larr; Folder barrel
+│       ├── chip/ ...
+│       ├── toggle/ ...
+│       └── confirm-dialog/ ...
+├── mcp-server/
+│   ├── index.ts                       &larr; Stdio transport (Claude Code CLI)
+│   ├── http.ts                        &larr; HTTP transport (Claude.ai web)
+│   ├── catalog.ts                     &larr; Auto-generated component catalog
+│   ├── tokens.ts                      &larr; Auto-generated design tokens
+│   ├── package.json
+│   └── Dockerfile
+├── scripts/
+│   ├── generate-catalog.ts            &larr; Generates mcp-server/catalog.ts
+│   └── generate-tokens.ts             &larr; Generates mcp-server/tokens.ts
+├── .storybook/                        &larr; Storybook config
+├── .mcp.json                          &larr; Figma + design system MCP
+├── tailwind.config.ts                 &larr; Design tokens (source of truth)
+├── tsup.config.ts                     &larr; Library build (ESM + CJS + DTS)
+├── vitest.config.ts                   &larr; Test configuration
+├── package.json                       &larr; @kaufman2699/kr-design-system
+└── .claude/plugins/figma-tailwind/    &larr; Figma conversion skill</code></pre>
     </div>
 
     <!-- TROUBLESHOOTING -->
-    <h2>Troubleshooting</h2>
+    <h2 id="troubleshooting">Troubleshooting</h2>
 
     <table>
       <tr>
@@ -1014,7 +1331,7 @@ import { Button, Chip, Toggle, ConfirmDialog } from "@kaufman2699/kr-design-syst
     </table>
 
     <!-- QUALITY CHECKLIST -->
-    <h2>Quality Checklist</h2>
+    <h2 id="quality-checklist">Quality Checklist</h2>
 
     <p>After generation, verify:</p>
 
@@ -1032,9 +1349,30 @@ import { Button, Chip, Toggle, ConfirmDialog } from "@kaufman2699/kr-design-syst
     </ul>
 
     <footer>
-      <p>@kaufman-rossin/kr-design-system &middot; Kaufman Rossin DevTech &middot; Last updated: June 2026</p>
+      <p>@kaufman2699/kr-design-system &middot; Kaufman Rossin DevTech &middot; Last updated: June 2026</p>
     </footer>
 
-  </div>
+    </div><!-- /.container -->
+  </div><!-- /.page-layout -->
+
+  <script>
+    const links = document.querySelectorAll('.sidebar a');
+    const sections = document.querySelectorAll('h2[id], h3[id]');
+
+    function updateActiveLink() {
+      let current = '';
+      sections.forEach(section => {
+        if (section.getBoundingClientRect().top <= 100) {
+          current = section.id;
+        }
+      });
+      links.forEach(link => {
+        link.classList.toggle('active', link.getAttribute('href') === '#' + current);
+      });
+    }
+
+    window.addEventListener('scroll', updateActiveLink);
+    updateActiveLink();
+  </script>
 </body>
 </html>
