@@ -6,6 +6,9 @@ const meta = {
   title: "UI/Toggle",
   component: Toggle,
   tags: ["autodocs"],
+  args: {
+    label: "Toggle",
+  },
   argTypes: {
     checked: {
       control: "boolean",

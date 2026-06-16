@@ -5,11 +5,12 @@ export interface ToggleProps
   extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "onChange"> {
   checked?: boolean;
   defaultChecked?: boolean;
+  label?: string;
   onChange?: (checked: boolean) => void;
 }
 
 const Toggle = React.forwardRef<HTMLButtonElement, ToggleProps>(
-  ({ className, checked, defaultChecked = false, onChange, ...props }, ref) => {
+  ({ className, checked, defaultChecked = false, label, onChange, ...props }, ref) => {
     const [internalChecked, setInternalChecked] = React.useState(defaultChecked);
     const isControlled = checked !== undefined;
     const isOn = isControlled ? checked : internalChecked;
@@ -27,6 +28,7 @@ const Toggle = React.forwardRef<HTMLButtonElement, ToggleProps>(
         type="button"
         role="switch"
         aria-checked={isOn}
+        aria-label={label || props["aria-label"] || "Toggle"}
         onClick={handleClick}
         className={cn(
           "relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full p-0.5",

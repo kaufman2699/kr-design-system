@@ -3,4 +3,5 @@ packages:
   - "mcp-server"
 
 allowBuilds:
+  canvas: true
   esbuild: true

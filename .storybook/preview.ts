@@ -17,6 +17,9 @@ const preview: Preview = {
         { name: "dark", value: "#153A61" },
       ],
     },
+    a11y: {
+      test: "error",
+    },
   },
 };
 
