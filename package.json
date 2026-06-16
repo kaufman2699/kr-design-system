@@ -18,14 +18,11 @@
       }
     },
     "./styles.css": "./dist/styles.css",
-    "./tailwind-config": {
-      "import": "./dist/tailwind-config.js",
-      "require": "./dist/tailwind-config.cjs"
-    }
+    "./tailwind-config": "./tailwind.config.js"
   },
   "files": [
     "dist",
-    "tailwind.config.ts"
+    "tailwind.config.js"
   ],
   "sideEffects": [
     "./dist/styles.css"
@@ -39,7 +36,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "generate:catalog": "node --experimental-strip-types scripts/generate-catalog.ts && node --experimental-strip-types scripts/generate-tokens.ts",
+    "generate:catalog": "tsx scripts/generate-catalog.ts && tsx scripts/generate-tokens.ts",
     "prepublishOnly": "pnpm typecheck && pnpm test && pnpm generate:catalog && pnpm build",
     "prepare": "node node_modules/simple-git-hooks/cli.js || true"
   },
@@ -70,6 +67,7 @@
     "storybook": "^10.4.5",
     "tailwindcss": "^3.4.0",
     "tsup": "^8.0.0",
+    "tsx": "^4.22.4",
     "typescript": "^6.0.3",
     "vitest": "^4.1.9"
   },

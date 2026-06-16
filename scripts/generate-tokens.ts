@@ -1,8 +1,8 @@
 /**
- * Generates mcp-server/tokens.ts from tailwind.config.ts and src/styles/globals.css.
+ * Generates mcp-server/tokens.ts from tailwind.config.js and src/styles/globals.css.
  *
  * Extracts:
- * - Colors from tailwind.config.ts theme.extend.colors
+ * - Colors from tailwind.config.js theme.extend.colors
  * - Font families from theme.extend.fontFamily
  * - Border radius from theme.extend.borderRadius
  * - Box shadows from theme.extend.boxShadow
@@ -15,7 +15,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 const ROOT = join(import.meta.dirname, "..");
-const TAILWIND_CONFIG = join(ROOT, "tailwind.config.ts");
+const TAILWIND_CONFIG = join(ROOT, "tailwind.config.js");
 const GLOBALS_CSS = join(ROOT, "src/styles/globals.css");
 const OUTPUT = join(ROOT, "mcp-server/tokens.ts");
 

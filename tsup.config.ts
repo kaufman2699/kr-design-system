@@ -3,9 +3,9 @@ import { defineConfig } from "tsup";
 export default defineConfig({
   entry: {
     index: "src/index.ts",
-    "tailwind-config": "tailwind.config.ts",
   },
   format: ["esm", "cjs"],
+  tsconfig: "tsconfig.build.json",
   dts: true,
   sourcemap: true,
   clean: true,

@@ -5,9 +5,12 @@
   "type": "module",
   "main": "index.ts",
   "scripts": {
-    "start": "node --experimental-strip-types index.ts",
-    "start:http": "node --experimental-strip-types http.ts",
-    "dev": "node --experimental-strip-types --watch http.ts"
+    "start": "tsx index.ts",
+    "start:http": "tsx http.ts",
+    "dev": "tsx --watch http.ts"
+  },
+  "devDependencies": {
+    "tsx": "^4.22.4"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.0",
